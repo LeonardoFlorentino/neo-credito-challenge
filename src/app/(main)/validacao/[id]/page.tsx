@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 
@@ -9,6 +10,7 @@ import { Typography } from "@/components/atoms/Typography";
 import { MiniMap } from "@/components/molecules/MiniMap";
 import { SimilarityScore } from "@/components/molecules/SimilarityScore";
 import { useProposals } from "@/hooks/useProposals";
+import { ProposalStatus } from "@/types/Proposal";
 
 import styles from "./page.module.css";
 
@@ -25,14 +27,43 @@ function formatResultado(resultado: "SUCESSO" | "SEM_RESPOSTA" | "FALHA") {
 
 export default function ValidacaoPorIdPage() {
   const params = useParams<{ id: string }>();
-  const { proposals } = useProposals();
+  const { proposals, updateProposalStatus } = useProposals();
   const id = typeof params?.id === "string" ? params.id : "";
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
 
   const proposta = proposals.find((item) => item.id === id);
 
   if (!proposta) {
     notFound();
   }
+
+  useEffect(() => {
+    if (!showSuccessToast) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setShowSuccessToast(false);
+    }, 3000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [showSuccessToast]);
+
+  const handleConfirmApprove = () => {
+    const hasUpdated = updateProposalStatus(
+      proposta.id,
+      ProposalStatus.AGUARDANDO_AUDITORIA,
+    );
+
+    setShowApproveModal(false);
+
+    if (hasUpdated) {
+      setShowSuccessToast(true);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -48,26 +79,28 @@ export default function ValidacaoPorIdPage() {
         <article className={`${styles.card} ${styles.cardWide}`}>
           <Typography variant="h2">Dados do Assinante</Typography>
 
-          <div className={styles.field}>
-            <span className={styles.label}>Nome</span>
-            <span className={styles.value}>{proposta.nomeCliente}</span>
-          </div>
+          <div className={styles.subscriberGrid}>
+            <div className={styles.field}>
+              <span className={styles.label}>Nome</span>
+              <span className={styles.value}>{proposta.nomeCliente}</span>
+            </div>
 
-          <div className={styles.field}>
-            <span className={styles.label}>CPF</span>
-            <span className={styles.value}>{proposta.cpfCliente}</span>
-          </div>
+            <div className={styles.field}>
+              <span className={styles.label}>CPF</span>
+              <span className={styles.value}>{proposta.cpfCliente}</span>
+            </div>
 
-          <div className={styles.field}>
-            <span className={styles.label}>IP</span>
-            <span className={styles.value}>{proposta.dossie.ipOrigem}</span>
-          </div>
+            <div className={styles.field}>
+              <span className={styles.label}>IP</span>
+              <span className={styles.value}>{proposta.dossie.ipOrigem}</span>
+            </div>
 
-          <div className={styles.field}>
-            <span className={styles.label}>Data</span>
-            <span className={styles.value}>
-              {new Date(proposta.dataEnvio).toLocaleString("pt-BR")}
-            </span>
+            <div className={styles.field}>
+              <span className={styles.label}>Data</span>
+              <span className={styles.value}>
+                {new Date(proposta.dataEnvio).toLocaleString("pt-BR")}
+              </span>
+            </div>
           </div>
         </article>
 
@@ -93,11 +126,17 @@ export default function ValidacaoPorIdPage() {
           <Typography variant="h2">Ações</Typography>
 
           <div className={styles.actions}>
-            <Button variant="primary">Aprovar validação</Button>
+            <Button
+              variant="primary"
+              onClick={() => setShowApproveModal(true)}
+              disabled={proposta.status === ProposalStatus.AGUARDANDO_AUDITORIA}
+            >
+              Aprovar validação
+            </Button>
             <Button variant="ghost">Solicitar novo documento</Button>
             <Button variant="secondary">Rejeitar proposta</Button>
             <Link
-              className={styles.link}
+              className={styles.actionLinkButton}
               href={proposta.assinaturaUrl}
               target="_blank"
               rel="noreferrer noopener"
@@ -129,6 +168,43 @@ export default function ValidacaoPorIdPage() {
           </ul>
         </article>
       </section>
+
+      {showApproveModal && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowApproveModal(false)}
+          role="presentation"
+        >
+          <div
+            className={styles.modalCard}
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="approve-dialog-title"
+          >
+            <Typography variant="h2" id="approve-dialog-title">
+              Confirmar aprovação
+            </Typography>
+            <Typography variant="body">
+              Deseja enviar esta proposta para auditoria?
+            </Typography>
+            <div className={styles.modalActions}>
+              <Button variant="ghost" onClick={() => setShowApproveModal(false)}>
+                Cancelar
+              </Button>
+              <Button variant="primary" onClick={handleConfirmApprove}>
+                Confirmar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSuccessToast && (
+        <div className={styles.toast} role="status" aria-live="polite">
+          Proposta atualizada para AGUARDANDO AUDITORIA.
+        </div>
+      )}
     </div>
   );
 }

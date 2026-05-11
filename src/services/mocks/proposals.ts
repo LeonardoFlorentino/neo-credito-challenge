@@ -138,3 +138,21 @@ export const proposalsMock: Proposal[] = [
     },
   },
 ];
+
+export function updateProposalStatusMock(id: string, status: ProposalStatus) {
+  const targetIndex = proposalsMock.findIndex((proposal) => proposal.id === id);
+
+  if (targetIndex < 0) {
+    return null;
+  }
+
+  const updatedProposal: Proposal = {
+    ...proposalsMock[targetIndex],
+    status,
+    dataUltimoEvento: new Date().toISOString(),
+  };
+
+  proposalsMock[targetIndex] = updatedProposal;
+
+  return updatedProposal;
+}

@@ -34,6 +34,9 @@ export function FilterBar({
       >
         <option value="ALL">Todos os status</option>
         <option value={ProposalStatus.AGUARDANDO}>Aguardando</option>
+        <option value={ProposalStatus.AGUARDANDO_AUDITORIA}>
+          Aguardando auditoria
+        </option>
         <option value={ProposalStatus.ASSINADO}>Assinado</option>
         <option value={ProposalStatus.RECUSADO}>Recusado</option>
         <option value={ProposalStatus.EXPIRADO}>Expirado</option>

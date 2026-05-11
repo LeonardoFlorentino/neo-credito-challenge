@@ -1,9 +1,32 @@
-import { useMemo } from "react";
+import { useCallback, useState } from "react";
 
-import { proposalsMock } from "@/services/mocks/proposals";
+import {
+  proposalsMock,
+  updateProposalStatusMock,
+} from "@/services/mocks/proposals";
+import { ProposalStatus } from "@/types/Proposal";
 
 export function useProposals() {
-  const proposals = useMemo(() => proposalsMock, []);
+  const [proposals, setProposals] = useState(() => [...proposalsMock]);
 
-  return { proposals };
+  const updateProposalStatus = useCallback(
+    (id: string, status: ProposalStatus) => {
+      const updatedProposal = updateProposalStatusMock(id, status);
+
+      if (!updatedProposal) {
+        return false;
+      }
+
+      setProposals((currentProposals) =>
+        currentProposals.map((proposal) =>
+          proposal.id === id ? updatedProposal : proposal,
+        ),
+      );
+
+      return true;
+    },
+    [],
+  );
+
+  return { proposals, updateProposalStatus };
 }
