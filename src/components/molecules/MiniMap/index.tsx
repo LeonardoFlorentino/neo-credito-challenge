@@ -1,9 +1,8 @@
 import {
   MiniMapContainer,
   MiniMapFrame,
-  MiniMapGrid,
+  MiniMapIframe,
   MiniMapLegend,
-  MiniMapMarker,
 } from "./styles";
 
 type MiniMapProps = {
@@ -11,28 +10,29 @@ type MiniMapProps = {
   lng: number;
 };
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
-}
+function toEmbedUrl(lat: number, lng: number) {
+  const delta = 0.02;
+  const minLng = lng - delta;
+  const minLat = lat - delta;
+  const maxLng = lng + delta;
+  const maxLat = lat + delta;
 
-function toMapPosition(lat: number, lng: number) {
-  const top = ((90 - lat) / 180) * 100;
-  const left = ((lng + 180) / 360) * 100;
-
-  return {
-    top: clamp(top, 8, 92),
-    left: clamp(left, 8, 92),
-  };
+  const bbox = `${minLng},${minLat},${maxLng},${maxLat}`;
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${lat},${lng}`;
 }
 
 export function MiniMap({ lat, lng }: MiniMapProps) {
-  const marker = toMapPosition(lat, lng);
+  const embedUrl = toEmbedUrl(lat, lng);
 
   return (
     <MiniMapContainer>
       <MiniMapFrame aria-label="Mini mapa da localização da proposta">
-        <MiniMapGrid />
-        <MiniMapMarker $top={marker.top} $left={marker.left} />
+        <MiniMapIframe
+          title="Mapa da localização aproximada"
+          src={embedUrl}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
       </MiniMapFrame>
       <MiniMapLegend>
         Coordenadas aproximadas: {lat.toFixed(5)}, {lng.toFixed(5)}

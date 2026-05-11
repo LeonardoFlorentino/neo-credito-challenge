@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Typography } from "@/components/atoms/Typography";
 import { useProposals } from "@/hooks/useProposals";
 
-export default function ValidationPage() {
+export default function ValidacaoPage() {
   const { proposals } = useProposals();
 
   return (
@@ -18,7 +18,7 @@ export default function ValidationPage() {
       <ul>
         {proposals.map((proposal) => (
           <li key={proposal.id}>
-            <Link href={`/validation/${proposal.id}`}>
+            <Link href={`/validacao/${proposal.id}`}>
               {proposal.numeroProposta} - {proposal.nomeCliente}
             </Link>
           </li>

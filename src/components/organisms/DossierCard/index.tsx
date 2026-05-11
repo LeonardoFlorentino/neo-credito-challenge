@@ -9,7 +9,7 @@ type DossierCardProps = {
 export function DossierCard({ proposal }: DossierCardProps) {
   return (
     <Card>
-      <Title>Dossie {proposal.numeroProposta}</Title>
+      <Title>Dossiê {proposal.numeroProposta}</Title>
       <Meta>Cliente: {proposal.nomeCliente}</Meta>
       <Meta>Status: {proposal.status}</Meta>
       <Meta>Selfie: {proposal.dossie.selfieUrl}</Meta>
@@ -17,7 +17,7 @@ export function DossierCard({ proposal }: DossierCardProps) {
       <Meta>Similaridade: {proposal.dossie.similaridade}</Meta>
       <Meta>IP de Origem: {proposal.dossie.ipOrigem}</Meta>
       <Meta>
-        Geolocalizacao: {proposal.dossie.geolocalizacao.lat}, {proposal.dossie.geolocalizacao.lng}
+        Geolocalização: {proposal.dossie.geolocalizacao.lat}, {proposal.dossie.geolocalizacao.lng}
       </Meta>
     </Card>
   );

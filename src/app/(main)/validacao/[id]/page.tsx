@@ -7,6 +7,7 @@ import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Typography } from "@/components/atoms/Typography";
 import { MiniMap } from "@/components/molecules/MiniMap";
+import { SimilarityScore } from "@/components/molecules/SimilarityScore";
 import { useProposals } from "@/hooks/useProposals";
 
 import styles from "./page.module.css";
@@ -73,12 +74,7 @@ export default function ValidacaoPorIdPage() {
         <article className={`${styles.card} ${styles.cardMedium}`}>
           <Typography variant="h2">Análise de Identidade</Typography>
 
-          <div className={styles.field}>
-            <span className={styles.label}>Similaridade</span>
-            <span className={styles.value}>
-              {(proposta.dossie.similaridade * 100).toFixed(1)}%
-            </span>
-          </div>
+          <SimilarityScore value={proposta.dossie.similaridade} />
 
           <div className={styles.field}>
             <span className={styles.label}>Geolocalização</span>

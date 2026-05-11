@@ -10,7 +10,7 @@ export function Sidebar() {
 
   const navItems = [
     { label: "Painel CORBAN", href: "/painel" },
-    { label: "Validação Operacional", href: "/validation" },
+    { label: "Validação Operacional", href: "/validacao" },
   ];
 
   return (
