@@ -1,34 +1,37 @@
-import type { Proposal } from "@/types/Proposal";
+import { Badge } from "@/components/atoms/Badge";
+import { useProposals } from "@/hooks/useProposals";
 
-import { Table } from "./styles";
+import { TableContainer, Table } from "./styles";
 
-type ProposalsTableProps = {
-  proposals: Proposal[];
-};
+export function ProposalsTable() {
+  const { proposals } = useProposals();
 
-export function ProposalsTable({ proposals }: ProposalsTableProps) {
   return (
-    <Table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Numero da Proposta</th>
-          <th>Cliente</th>
-          <th>Status</th>
-          <th>Ultimo Evento</th>
-        </tr>
-      </thead>
-      <tbody>
-        {proposals.map((proposal) => (
-          <tr key={proposal.id}>
-            <td>{proposal.id}</td>
-            <td>{proposal.numeroProposta}</td>
-            <td>{proposal.nomeCliente}</td>
-            <td>{proposal.status}</td>
-            <td>{new Date(proposal.dataUltimoEvento).toLocaleString("pt-BR")}</td>
+    <TableContainer>
+      <Table>
+        <thead>
+          <tr>
+            <th>Nº</th>
+            <th>Cliente</th>
+            <th>Status</th>
+            <th>Data</th>
           </tr>
-        ))}
-      </tbody>
-    </Table>
+        </thead>
+        <tbody>
+          {proposals.map((proposal) => (
+            <tr key={proposal.id}>
+              <td>{proposal.numeroProposta}</td>
+              <td>{proposal.nomeCliente}</td>
+              <td>
+                <Badge variant={proposal.status}>{proposal.status}</Badge>
+              </td>
+              <td>
+                {new Date(proposal.dataUltimoEvento).toLocaleDateString("pt-BR")}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </TableContainer>
   );
 }

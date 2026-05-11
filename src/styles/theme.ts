@@ -19,6 +19,13 @@ export const theme = {
     gray800: "#1f2937",
     gray900: "#111827",
   },
+  spacing: {
+    xs: "4px",
+    sm: "8px",
+    md: "12px",
+    lg: "16px",
+    xl: "24px",
+  },
 };
 
 export type AppTheme = typeof theme;

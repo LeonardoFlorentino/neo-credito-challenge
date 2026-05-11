@@ -1,6 +1,7 @@
 "use client";
 
 import { Typography } from "@/components/atoms/Typography";
+import { ProposalsTable } from "@/components/organisms/ProposalsTable";
 
 export default function DashboardPage() {
   return (
@@ -9,6 +10,7 @@ export default function DashboardPage() {
       <Typography variant="body">
         Bem-vindo ao painel de controle de propostas.
       </Typography>
+      <ProposalsTable />
     </div>
   );
 }
