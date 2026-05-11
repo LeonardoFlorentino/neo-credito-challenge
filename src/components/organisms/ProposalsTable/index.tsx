@@ -12,18 +12,20 @@ export function ProposalsTable({ proposals }: ProposalsTableProps) {
       <thead>
         <tr>
           <th>ID</th>
-          <th>Customer</th>
+          <th>Numero da Proposta</th>
+          <th>Cliente</th>
           <th>Status</th>
-          <th>Amount</th>
+          <th>Ultimo Evento</th>
         </tr>
       </thead>
       <tbody>
         {proposals.map((proposal) => (
           <tr key={proposal.id}>
             <td>{proposal.id}</td>
-            <td>{proposal.customerName}</td>
+            <td>{proposal.numeroProposta}</td>
+            <td>{proposal.nomeCliente}</td>
             <td>{proposal.status}</td>
-            <td>{proposal.amount}</td>
+            <td>{new Date(proposal.dataUltimoEvento).toLocaleString("pt-BR")}</td>
           </tr>
         ))}
       </tbody>

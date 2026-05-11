@@ -8,7 +8,7 @@ export function useProposals() {
   const proposals = useMemo(
     () =>
       proposalsMock.filter((proposal) =>
-        proposal.customerName.toLowerCase().includes(search.toLowerCase()),
+        proposal.nomeCliente.toLowerCase().includes(search.toLowerCase()),
       ),
     [search],
   );

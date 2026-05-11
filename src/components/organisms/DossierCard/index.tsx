@@ -9,10 +9,16 @@ type DossierCardProps = {
 export function DossierCard({ proposal }: DossierCardProps) {
   return (
     <Card>
-      <Title>Dossier #{proposal.id}</Title>
-      <Meta>Customer: {proposal.customerName}</Meta>
+      <Title>Dossie {proposal.numeroProposta}</Title>
+      <Meta>Cliente: {proposal.nomeCliente}</Meta>
       <Meta>Status: {proposal.status}</Meta>
-      <Meta>Amount: {proposal.amount}</Meta>
+      <Meta>Selfie: {proposal.dossie.selfieUrl}</Meta>
+      <Meta>Documento: {proposal.dossie.documentoUrl}</Meta>
+      <Meta>Similaridade: {proposal.dossie.similaridade}</Meta>
+      <Meta>IP de Origem: {proposal.dossie.ipOrigem}</Meta>
+      <Meta>
+        Geolocalizacao: {proposal.dossie.geolocalizacao.lat}, {proposal.dossie.geolocalizacao.lng}
+      </Meta>
     </Card>
   );
 }
