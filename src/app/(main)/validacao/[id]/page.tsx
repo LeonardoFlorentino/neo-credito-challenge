@@ -30,7 +30,13 @@ export default function ValidacaoPorIdPage() {
   const { proposals, updateProposalStatus } = useProposals();
   const id = typeof params?.id === "string" ? params.id : "";
   const [showApproveModal, setShowApproveModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState(
+    "Proposta atualizada para AGUARDANDO AUDITORIA.",
+  );
+  const [pendingReason, setPendingReason] = useState("");
+  const [pendingDetail, setPendingDetail] = useState("");
 
   const proposta = proposals.find((item) => item.id === id);
 
@@ -61,9 +67,27 @@ export default function ValidacaoPorIdPage() {
     setShowApproveModal(false);
 
     if (hasUpdated) {
+      setToastMessage("Proposta atualizada para AGUARDANDO AUDITORIA.");
       setShowSuccessToast(true);
     }
   };
+
+  const handleConfirmReject = () => {
+    const hasUpdated = updateProposalStatus(proposta.id, ProposalStatus.RECUSADO);
+
+    if (!hasUpdated) {
+      return;
+    }
+
+    setShowRejectModal(false);
+    setPendingReason("");
+    setPendingDetail("");
+    setToastMessage("Proposta atualizada para RECUSADO.");
+    setShowSuccessToast(true);
+  };
+
+  const isRejectFormValid =
+    pendingReason.trim().length > 0 && pendingDetail.trim().length > 0;
 
   return (
     <div className={styles.container}>
@@ -129,12 +153,21 @@ export default function ValidacaoPorIdPage() {
             <Button
               variant="primary"
               onClick={() => setShowApproveModal(true)}
-              disabled={proposta.status === ProposalStatus.AGUARDANDO_AUDITORIA}
+              disabled={
+                proposta.status === ProposalStatus.AGUARDANDO_AUDITORIA ||
+                proposta.status === ProposalStatus.RECUSADO
+              }
             >
               Aprovar validação
             </Button>
             <Button variant="ghost">Solicitar novo documento</Button>
-            <Button variant="secondary">Rejeitar proposta</Button>
+            <Button
+              variant="secondary"
+              onClick={() => setShowRejectModal(true)}
+              disabled={proposta.status === ProposalStatus.RECUSADO}
+            >
+              Reprovar proposta
+            </Button>
             <Link
               className={styles.actionLinkButton}
               href={proposta.assinaturaUrl}
@@ -200,9 +233,71 @@ export default function ValidacaoPorIdPage() {
         </div>
       )}
 
+      {showRejectModal && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowRejectModal(false)}
+          role="presentation"
+        >
+          <div
+            className={styles.modalCard}
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reject-dialog-title"
+          >
+            <Typography variant="h2" id="reject-dialog-title">
+              Informar Pendência
+            </Typography>
+            <Typography variant="body">
+              Selecione o motivo e descreva a pendência para reprovar a proposta.
+            </Typography>
+
+            <label className={styles.modalField}>
+              <span className={styles.label}>Motivo</span>
+              <select
+                className={styles.modalInput}
+                value={pendingReason}
+                onChange={(event) => setPendingReason(event.target.value)}
+              >
+                <option value="">Selecione um motivo</option>
+                <option value="DOCUMENTO_ILEGIVEL">Documento ilegível</option>
+                <option value="DIVERGENCIA_BIOMETRICA">Divergência biométrica</option>
+                <option value="DADOS_INCONSISTENTES">Dados inconsistentes</option>
+                <option value="SUSPEITA_FRAUDE">Suspeita de fraude</option>
+              </select>
+            </label>
+
+            <label className={styles.modalField}>
+              <span className={styles.label}>Descrição da pendência</span>
+              <textarea
+                className={styles.modalTextarea}
+                value={pendingDetail}
+                onChange={(event) => setPendingDetail(event.target.value)}
+                rows={4}
+                placeholder="Descreva a pendência encontrada"
+              />
+            </label>
+
+            <div className={styles.modalActions}>
+              <Button variant="ghost" onClick={() => setShowRejectModal(false)}>
+                Cancelar
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={handleConfirmReject}
+                disabled={!isRejectFormValid}
+              >
+                Confirmar reprovação
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showSuccessToast && (
         <div className={styles.toast} role="status" aria-live="polite">
-          Proposta atualizada para AGUARDANDO AUDITORIA.
+          {toastMessage}
         </div>
       )}
     </div>

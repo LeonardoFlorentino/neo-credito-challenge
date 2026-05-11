@@ -150,6 +150,33 @@
   gap: 8px;
 }
 
+.modalField {
+  display: grid;
+  gap: 6px;
+}
+
+.modalInput,
+.modalTextarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #1f2937;
+  background: #ffffff;
+}
+
+.modalTextarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+.modalInput:focus,
+.modalTextarea:focus {
+  outline: 2px solid #0b1f3a;
+  outline-offset: 1px;
+}
+
 .toast {
   position: fixed;
   right: 16px;
