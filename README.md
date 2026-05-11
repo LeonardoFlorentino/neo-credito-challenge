@@ -1,81 +1,139 @@
 # Desafio Técnico Neo Crédito
 
-Desafio técnico desenvolvido para o processo seletivo da Neo Crédito, com foco na modelagem de um fluxo de Assinatura Eletrônica para propostas de crédito.
+Aplicação frontend em Next.js para simular o fluxo de validação e assinatura eletrônica de propostas de crédito.
 
-## Aviso Importante
+<p align="center">
+	<b>Frontend challenge para fluxo de propostas de crédito com validação, assinatura e feedback global de estados</b><br/>
+	<img src="https://img.shields.io/badge/Platform-Web-0f172a" alt="Web" />
+	<img src="https://img.shields.io/badge/Next.js-16.x-000000?logo=next.js" alt="Next.js" />
+	<img src="https://img.shields.io/badge/React-19.x-61dafb?logo=react" alt="React" />
+	<img src="https://img.shields.io/badge/TypeScript-5.x-3178c6?logo=typescript" alt="TypeScript" />
+	<img src="https://img.shields.io/badge/Styled%20Components-6.x-db7093?logo=styledcomponents" alt="Styled Components" />
+	<img src="https://img.shields.io/badge/MSW-2.x-ff6a33" alt="MSW" />
+	<img src="https://img.shields.io/badge/Jest-30.x-c21325?logo=jest" alt="Jest" />
+</p>
 
-Este repositório não representa um produto corporativo final, nem uma solução real completa e robusta de mercado.
+## Objetivo
 
-Trata-se de um desafio técnico para vaga de emprego, criado para demonstrar capacidade de:
+Este repositório foi construído como desafio técnico, com foco em:
 
-- Arquitetura frontend
-- Organização de código
-- Qualidade técnica
-- Modelagem de fluxo de negócio
-- Boas práticas de testes
+- organização de arquitetura frontend;
+- modelagem de fluxo de negócio orientado a estados;
+- testabilidade e confiabilidade dos fluxos principais;
+- legibilidade e evolução contínua do código.
 
-## Introdução
+## Decisões Técnicas
 
-O sistema de Assinatura Eletrônica tem como objetivo garantir segurança jurídica, rastreabilidade e agilidade no ciclo de formalização de propostas. Em um cenário de crédito, a assinatura digital reduz fricções operacionais, acelera a tomada de decisão e melhora a experiência do cliente ao eliminar etapas presenciais e documentos físicos.
+### Atomic Design
 
-Neste desafio, a proposta é demonstrar como um frontend pode orquestrar estados, interfaces e validações de forma clara e escalável, sem a pretensão de cobrir todas as regras de produção de uma operação financeira real.
+O projeto organiza componentes por níveis de composição para facilitar reuso e manutenção:
 
-## Tecnologias Utilizadas Neste Desafio
+- atoms: blocos básicos visuais e de interação;
+- molecules: combinações pequenas e reutilizáveis;
+- organisms: seções maiores da interface, com regra de apresentação.
 
-- React/Next.js
-- TypeScript
-- Styled Components
-- MSW (Mock Service Worker)
-- Jest
+Benefícios práticos:
 
-Observação: a stack deste desafio foi definida pelo escopo técnico da avaliação e não replica obrigatoriamente todos os itens da vaga em produção.
+- reduz duplicação de UI;
+- deixa clara a responsabilidade de cada camada;
+- melhora a previsibilidade dos testes por nível de componente.
+
+### Styled Components
+
+Styled Components foi adotado para co-localizar estilo e componente, mantendo encapsulamento visual e tema centralizado.
+
+Benefícios práticos:
+
+- estilos com escopo local;
+- composição dinâmica de estilos via props;
+- manutenção mais simples de tokens e consistência visual.
+
+### MSW (Mock Service Worker)
+
+MSW foi escolhido para simular API de forma realista, tanto no desenvolvimento quanto nos testes.
+
+Benefícios práticos:
+
+- desacoplamento entre frontend e backend real;
+- testes de integração mais próximos do comportamento de rede;
+- controle claro de cenários de sucesso, loading, erro e retry.
 
 ## Diagrama de Máquina de Estados (Status da Proposta)
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Criada
-    Criada --> EmAnalise : iniciar_analise
-    EmAnalise --> AguardandoDocumentos : solicitar_pendencia
-    AguardandoDocumentos --> EmAnalise : reenviar_documentos
-    EmAnalise --> AguardandoAssinatura : aprovada
-    EmAnalise --> Reprovada : reprovada
-    AguardandoAssinatura --> Assinada : assinatura_confirmada
-    AguardandoAssinatura --> Expirada : prazo_excedido
-    Assinada --> Concluida : formalizacao_final
-    Reprovada --> [*]
-    Expirada --> [*]
-    Concluida --> [*]
+		[*] --> Criada
+		Criada --> EmAnalise : iniciar_analise
+		EmAnalise --> AguardandoDocumentos : solicitar_pendencia
+		AguardandoDocumentos --> EmAnalise : reenviar_documentos
+		EmAnalise --> AguardandoAssinatura : aprovada
+		EmAnalise --> Reprovada : reprovada
+		AguardandoAssinatura --> Assinada : assinatura_confirmada
+		AguardandoAssinatura --> Expirada : prazo_excedido
+		Assinada --> Concluida : formalizacao_final
+		Reprovada --> [*]
+		Expirada --> [*]
+		Concluida --> [*]
 ```
 
-## Sobre a Neo Crédito (Contexto Institucional)
+## Notas de Desenvolvimento
 
-A Neo Crédito apresenta o crédito como ferramenta de transformação, com foco em clareza, respeito e empatia no atendimento a servidores públicos em todo o Brasil.
+As anotações de apoio técnico ficam em [src/dev-notes/](src/dev-notes/) e são ignoradas no versionamento Git, junto com [dev-notes/](dev-notes/).
 
-Pontos institucionais destacados:
+Essas notas costumam reunir:
 
-- Missão: transformar vidas por meio de soluções de crédito com responsabilidade, empatia e ética
-- Visão: revolucionar o mercado de crédito no Brasil, com soluções inovadoras e acessíveis
-- Valores: respeito pela pessoa, atendimento, excelência e integridade
+- contexto de etapas e decisões;
+- critérios de implementação;
+- observações sobre fluxos e cobertura de testes.
 
-## Benefícios e Ambiente (Resumo da Descrição da Vaga)
+## Instalação e Execução
 
-- Ambiente acolhedor e colaborativo
-- Caju Benefícios
-- Plano de saúde Amil
-- Plano odontológico Uniodonto
-- Wellhub
-- Atendimento psicológico e nutricional (Conexa Saúde)
-- Convênio farmácia
-- Ginástica laboral
-- Eventos internos e ações de reconhecimento
-- Parcerias com instituições de ensino
-- Máquina self-service (cafés, chás e snacks)
-- Rentbrella
+### 1. Pré-requisitos
 
-## Escopo e Limitações do Desafio
+- Node.js 20+;
+- npm 10+.
 
-- Este material possui finalidade avaliativa de processo seletivo.
-- Não substitui desenho completo de arquitetura de produção.
-- Não contempla todos os requisitos de segurança, compliance e operação de uma fintech real.
-- Prioriza clareza técnica, legibilidade e capacidade de evolução da solução.
+### 2. Instalar dependências
+
+```bash
+npm install
+```
+
+### 3. Rodar em desenvolvimento
+
+```bash
+npm run dev
+```
+
+Aplicação disponível em http://localhost:3000.
+
+### 4. Validar qualidade
+
+Checagem de tipos:
+
+```bash
+npx tsc --noEmit
+```
+
+Lint:
+
+```bash
+npm run lint
+```
+
+Testes:
+
+```bash
+npm test -- --runInBand
+```
+
+### 5. Build de produção
+
+```bash
+npm run build
+npm start
+```
+
+## Escopo
+
+Projeto com finalidade avaliativa. Não representa integralmente requisitos de produção, como segurança, compliance, observabilidade e operação em escala.
