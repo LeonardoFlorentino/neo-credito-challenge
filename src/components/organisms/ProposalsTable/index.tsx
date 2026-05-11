@@ -2,13 +2,19 @@ import { Badge } from "@/components/atoms/Badge";
 import type { Proposal } from "@/types/Proposal";
 
 import { TableContainer, Table } from "./styles";
+import {
+  StatusIndicator,
+  NewIndicator,
+  ProposalCellContent,
+} from "./Indicators";
 
 type ProposalsTableProps = {
   proposals: Proposal[];
 };
 
 export function ProposalsTable({ proposals }: ProposalsTableProps) {
-
+  // For demo: treat proposals with status ASSINADO as 'newly signed' (show indicator)
+  // and proposals with status AGUARDANDO as 'new'.
   return (
     <TableContainer>
       <Table>
@@ -23,7 +29,17 @@ export function ProposalsTable({ proposals }: ProposalsTableProps) {
         <tbody>
           {proposals.map((proposal) => (
             <tr key={proposal.id}>
-              <td>{proposal.numeroProposta}</td>
+              <td>
+                <ProposalCellContent>
+                  {proposal.status === "AGUARDANDO" && (
+                    <NewIndicator>Novo</NewIndicator>
+                  )}
+                  {proposal.status === "ASSINADO" && (
+                    <StatusIndicator title="Concluído" />
+                  )}
+                  <span>{proposal.numeroProposta}</span>
+                </ProposalCellContent>
+              </td>
               <td>{proposal.nomeCliente}</td>
               <td>
                 <Badge variant={proposal.status}>{proposal.status}</Badge>
