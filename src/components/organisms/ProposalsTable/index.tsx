@@ -1,10 +1,13 @@
 import { Badge } from "@/components/atoms/Badge";
-import { useProposals } from "@/hooks/useProposals";
+import type { Proposal } from "@/types/Proposal";
 
 import { TableContainer, Table } from "./styles";
 
-export function ProposalsTable() {
-  const { proposals } = useProposals();
+type ProposalsTableProps = {
+  proposals: Proposal[];
+};
+
+export function ProposalsTable({ proposals }: ProposalsTableProps) {
 
   return (
     <TableContainer>
