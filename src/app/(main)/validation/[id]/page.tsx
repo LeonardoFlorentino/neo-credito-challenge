@@ -6,6 +6,7 @@ import { notFound, useParams } from "next/navigation";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Typography } from "@/components/atoms/Typography";
+import { MiniMap } from "@/components/molecules/MiniMap";
 import { useProposals } from "@/hooks/useProposals";
 
 import styles from "./page.module.css";
@@ -52,19 +53,17 @@ export default function ValidacaoPorIdPage() {
           </div>
 
           <div className={styles.field}>
-            <span className={styles.label}>Link de assinatura</span>
-            <Link
-              className={styles.link}
-              href={proposta.assinaturaUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              Abrir assinatura digital
-            </Link>
+            <span className={styles.label}>CPF</span>
+            <span className={styles.value}>{proposta.cpfCliente}</span>
           </div>
 
           <div className={styles.field}>
-            <span className={styles.label}>Data de envio</span>
+            <span className={styles.label}>IP</span>
+            <span className={styles.value}>{proposta.dossie.ipOrigem}</span>
+          </div>
+
+          <div className={styles.field}>
+            <span className={styles.label}>Data</span>
             <span className={styles.value}>
               {new Date(proposta.dataEnvio).toLocaleString("pt-BR")}
             </span>
@@ -82,16 +81,16 @@ export default function ValidacaoPorIdPage() {
           </div>
 
           <div className={styles.field}>
-            <span className={styles.label}>IP de origem</span>
-            <span className={styles.value}>{proposta.dossie.ipOrigem}</span>
-          </div>
-
-          <div className={styles.field}>
             <span className={styles.label}>Geolocalização</span>
             <span className={styles.value}>
               {proposta.dossie.geolocalizacao.lat}, {proposta.dossie.geolocalizacao.lng}
             </span>
           </div>
+
+          <MiniMap
+            lat={proposta.dossie.geolocalizacao.lat}
+            lng={proposta.dossie.geolocalizacao.lng}
+          />
         </article>
 
         <article className={`${styles.card} ${styles.cardFull}`}>
@@ -101,6 +100,14 @@ export default function ValidacaoPorIdPage() {
             <Button variant="primary">Aprovar validação</Button>
             <Button variant="ghost">Solicitar novo documento</Button>
             <Button variant="secondary">Rejeitar proposta</Button>
+            <Link
+              className={styles.link}
+              href={proposta.assinaturaUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Abrir assinatura digital
+            </Link>
           </div>
 
           <Typography variant="body">Log de tentativas de contato</Typography>

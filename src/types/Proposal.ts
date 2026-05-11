@@ -27,6 +27,7 @@ export interface Proposal {
   id: string;
   numeroProposta: string;
   nomeCliente: string;
+  cpfCliente: string;
   status: ProposalStatus;
   dataUltimoEvento: string;
   assinaturaUrl: string;
