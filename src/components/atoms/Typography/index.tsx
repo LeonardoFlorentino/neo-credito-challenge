@@ -1,11 +1,6 @@
 import type { ElementType, HTMLAttributes, ReactNode } from "react";
 
-import {
-  StyledH1,
-  StyledH2,
-  StyledBody,
-  StyledCaption,
-} from "./styles";
+import { StyledH1, StyledH2, StyledBody, StyledCaption } from "./styles";
 
 type TypographyVariant = "h1" | "h2" | "body" | "caption";
 
