@@ -1,0 +1,114 @@
+.container {
+  display: grid;
+  gap: 16px;
+}
+
+.header {
+  display: grid;
+  gap: 8px;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.cardWide {
+  grid-column: span 7;
+}
+
+.cardMedium {
+  grid-column: span 5;
+}
+
+.cardFull {
+  grid-column: span 12;
+}
+
+.field {
+  display: grid;
+  gap: 4px;
+}
+
+.label {
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.value {
+  color: #1f2937;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.link {
+  color: #0b1f3a;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.listItem {
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.outcomeOk {
+  color: #1f8a4d;
+  font-weight: 600;
+}
+
+.outcomeWarn {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .cardWide,
+  .cardMedium,
+  .cardFull {
+    grid-column: span 12;
+  }
+}

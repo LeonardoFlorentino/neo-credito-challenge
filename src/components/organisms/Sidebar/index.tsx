@@ -9,7 +9,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   const navItems = [
-    { label: "Dashboard CORBAN", href: "/dashboard" },
+    { label: "Painel CORBAN", href: "/painel" },
     { label: "Validação Operacional", href: "/validation" },
   ];
 
