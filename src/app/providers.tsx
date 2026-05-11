@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import { AppThemeProvider } from "@/styles/ThemeProvider";
+
 type ProvidersProps = {
   children: React.ReactNode;
 };
@@ -13,5 +15,5 @@ export function Providers({ children }: ProvidersProps) {
     });
   }, []);
 
-  return <>{children}</>;
+  return <AppThemeProvider>{children}</AppThemeProvider>;
 }
