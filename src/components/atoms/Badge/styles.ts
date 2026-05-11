@@ -1,31 +1,29 @@
 import styled, { css } from "styled-components";
+import { ProposalStatus } from "@/types/Proposal";
 
-type BadgeVariant = "success" | "warning" | "neutral";
+type BadgeVariant = ProposalStatus | "neutral";
+
+const colorMap: Record<BadgeVariant, { bg: string; color: string }> = {
+  [ProposalStatus.AGUARDANDO]: { bg: "#fef3c7", color: "#92400e" },
+  [ProposalStatus.ASSINADO]: { bg: "#d1fae5", color: "#065f46" },
+  [ProposalStatus.RECUSADO]: { bg: "#fee2e2", color: "#7f1d1d" },
+  [ProposalStatus.EXPIRADO]: { bg: "#e5e7eb", color: "#374151" },
+  neutral: { bg: "#e5e7eb", color: "#374151" },
+};
 
 export const StyledBadge = styled.span<{ $variant: BadgeVariant }>`
+  display: inline-block;
   border-radius: 9999px;
-  padding: 4px 10px;
+  padding: 6px 12px;
   font-size: 12px;
   font-weight: 600;
+  line-height: 1;
 
-  ${({ $variant }) =>
-    $variant === "success" &&
-    css`
-      background: #d1fae5;
-      color: #065f46;
-    `}
-
-  ${({ $variant }) =>
-    $variant === "warning" &&
-    css`
-      background: #fef3c7;
-      color: #92400e;
-    `}
-
-  ${({ $variant }) =>
-    $variant === "neutral" &&
-    css`
-      background: #e5e7eb;
-      color: #374151;
-    `}
+  ${({ $variant }) => {
+    const colors = colorMap[$variant];
+    return css`
+      background: ${colors.bg};
+      color: ${colors.color};
+    `;
+  }}
 `;

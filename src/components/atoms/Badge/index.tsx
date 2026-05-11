@@ -1,6 +1,7 @@
+import { ProposalStatus } from "@/types/Proposal";
 import { StyledBadge } from "./styles";
 
-type BadgeVariant = "success" | "warning" | "neutral";
+type BadgeVariant = ProposalStatus | "neutral";
 
 type BadgeProps = {
   children: string;
