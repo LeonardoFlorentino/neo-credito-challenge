@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { Button } from "@/components/atoms/Button";
+import { Skeleton } from "@/components/atoms/Skeleton";
 import { Typography } from "@/components/atoms/Typography";
 import { FilterBar } from "@/components/molecules/FilterBar";
 import { ProposalDetailsDrawer } from "@/components/organisms/ProposalDetailsDrawer";
@@ -10,7 +12,7 @@ import { useProposals } from "@/hooks/useProposals";
 import { Proposal, ProposalStatus } from "@/types/Proposal";
 
 export default function PainelPage() {
-  const { proposals } = useProposals();
+  const { proposals, isLoading, error, retry } = useProposals();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState<ProposalStatus | "ALL">("ALL");
@@ -37,6 +39,31 @@ export default function PainelPage() {
       }),
     [proposals, debouncedSearch, status],
   );
+
+  if (isLoading) {
+    return (
+      <div>
+        <Skeleton width="220px" height="34px" />
+        <Skeleton width="320px" height="20px" style={{ marginTop: "8px" }} />
+        <Skeleton height="52px" style={{ marginTop: "16px" }} />
+        <Skeleton height="360px" style={{ marginTop: "16px" }} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <Typography variant="h1">Painel CORBAN</Typography>
+        <Typography variant="body" style={{ marginTop: "8px" }}>
+          {error}
+        </Typography>
+        <Button style={{ marginTop: "16px" }} onClick={() => void retry()}>
+          Tentar novamente
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div>

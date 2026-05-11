@@ -1,6 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
+  fetchProposalsMock,
   proposalsMock,
   updateProposalStatusMock,
 } from "@/services/mocks/proposals";
@@ -8,6 +9,32 @@ import { ProposalStatus } from "@/types/Proposal";
 
 export function useProposals() {
   const [proposals, setProposals] = useState(() => [...proposalsMock]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadProposals = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const data = await fetchProposalsMock();
+      setProposals(data);
+    } catch {
+      setError("Não foi possível carregar as propostas.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void loadProposals();
+    }, 0);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [loadProposals]);
 
   const updateProposalStatus = useCallback(
     (id: string, status: ProposalStatus) => {
@@ -28,5 +55,5 @@ export function useProposals() {
     [],
   );
 
-  return { proposals, updateProposalStatus };
+  return { proposals, isLoading, error, retry: loadProposals, updateProposalStatus };
 }

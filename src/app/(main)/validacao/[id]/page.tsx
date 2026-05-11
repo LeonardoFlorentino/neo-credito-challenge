@@ -6,6 +6,7 @@ import { notFound, useParams } from "next/navigation";
 
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
+import { Skeleton } from "@/components/atoms/Skeleton";
 import { Typography } from "@/components/atoms/Typography";
 import { MiniMap } from "@/components/molecules/MiniMap";
 import { SimilarityScore } from "@/components/molecules/SimilarityScore";
@@ -27,7 +28,7 @@ function formatResultado(resultado: "SUCESSO" | "SEM_RESPOSTA" | "FALHA") {
 
 export default function ValidacaoPorIdPage() {
   const params = useParams<{ id: string }>();
-  const { proposals, updateProposalStatus } = useProposals();
+  const { proposals, isLoading, error, retry, updateProposalStatus } = useProposals();
   const id = typeof params?.id === "string" ? params.id : "";
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
@@ -37,12 +38,7 @@ export default function ValidacaoPorIdPage() {
   );
   const [pendingReason, setPendingReason] = useState("");
   const [pendingDetail, setPendingDetail] = useState("");
-
   const proposta = proposals.find((item) => item.id === id);
-
-  if (!proposta) {
-    notFound();
-  }
 
   useEffect(() => {
     if (!showSuccessToast) {
@@ -57,6 +53,31 @@ export default function ValidacaoPorIdPage() {
       window.clearTimeout(timeoutId);
     };
   }, [showSuccessToast]);
+
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <Skeleton width="280px" height="34px" />
+        <Skeleton width="180px" height="20px" />
+        <Skeleton height="220px" radius="12px" />
+        <Skeleton height="280px" radius="12px" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.container}>
+        <Typography variant="h1">Validação da Proposta</Typography>
+        <Typography variant="body">{error}</Typography>
+        <Button onClick={() => void retry()}>Tentar novamente</Button>
+      </div>
+    );
+  }
+
+  if (!proposta) {
+    notFound();
+  }
 
   const handleConfirmApprove = () => {
     const hasUpdated = updateProposalStatus(

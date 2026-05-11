@@ -3,6 +3,8 @@
 import Link from "next/link";
 
 import { Badge } from "@/components/atoms/Badge";
+import { Button } from "@/components/atoms/Button";
+import { Skeleton } from "@/components/atoms/Skeleton";
 import { Typography } from "@/components/atoms/Typography";
 import { useProposals } from "@/hooks/useProposals";
 import { ProposalStatus } from "@/types/Proposal";
@@ -30,7 +32,33 @@ function getStatusLabel(status: ProposalStatus) {
 }
 
 export default function ValidacaoPage() {
-  const { proposals } = useProposals();
+  const { proposals, isLoading, error, retry } = useProposals();
+
+  if (isLoading) {
+    return (
+      <section className={styles.container}>
+        <Skeleton width="280px" height="34px" />
+        <Skeleton width="360px" height="18px" />
+        <div className={styles.summaryGrid}>
+          <Skeleton height="88px" radius="10px" />
+          <Skeleton height="88px" radius="10px" />
+          <Skeleton height="88px" radius="10px" />
+        </div>
+        <Skeleton height="126px" radius="12px" />
+        <Skeleton height="126px" radius="12px" />
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className={styles.container}>
+        <Typography variant="h1">Validação Operacional</Typography>
+        <Typography variant="body">{error}</Typography>
+        <Button onClick={() => void retry()}>Tentar novamente</Button>
+      </section>
+    );
+  }
 
   const waitingCount = proposals.filter(
     (proposal) => proposal.status === ProposalStatus.AGUARDANDO,

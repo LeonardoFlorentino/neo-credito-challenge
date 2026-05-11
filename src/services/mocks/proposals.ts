@@ -139,6 +139,14 @@ export const proposalsMock: Proposal[] = [
   },
 ];
 
+export async function fetchProposalsMock(delayMs = 700): Promise<Proposal[]> {
+  await new Promise((resolve) => {
+    setTimeout(resolve, delayMs);
+  });
+
+  return [...proposalsMock];
+}
+
 export function updateProposalStatusMock(id: string, status: ProposalStatus) {
   const targetIndex = proposalsMock.findIndex((proposal) => proposal.id === id);
 
