@@ -31,8 +31,17 @@ export const Table = styled.table`
     background: ${({ theme }) => theme.colors.gray100};
   }
 
+  tbody tr {
+    cursor: pointer;
+  }
+
   tbody tr:hover {
     background: ${({ theme }) => theme.colors.gray200};
+  }
+
+  tbody tr:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.primary};
+    outline-offset: -2px;
   }
 
   tbody tr:last-child td {

@@ -4,15 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Typography } from "@/components/atoms/Typography";
 import { FilterBar } from "@/components/molecules/FilterBar";
+import { ProposalDetailsDrawer } from "@/components/organisms/ProposalDetailsDrawer";
 import { ProposalsTable } from "@/components/organisms/ProposalsTable";
 import { useProposals } from "@/hooks/useProposals";
-import { ProposalStatus } from "@/types/Proposal";
+import { Proposal, ProposalStatus } from "@/types/Proposal";
 
 export default function DashboardPage() {
   const { proposals } = useProposals();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState<ProposalStatus | "ALL">("ALL");
+  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -48,7 +50,15 @@ export default function DashboardPage() {
         onSearchChange={setSearch}
         onStatusChange={setStatus}
       />
-      <ProposalsTable proposals={filteredProposals} />
+      <ProposalsTable
+        proposals={filteredProposals}
+        onRowClick={(proposal) => setSelectedProposal(proposal)}
+      />
+      <ProposalDetailsDrawer
+        proposal={selectedProposal}
+        isOpen={selectedProposal !== null}
+        onClose={() => setSelectedProposal(null)}
+      />
     </div>
   );
 }

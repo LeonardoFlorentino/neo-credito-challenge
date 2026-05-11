@@ -10,9 +10,10 @@ import {
 
 type ProposalsTableProps = {
   proposals: Proposal[];
+  onRowClick?: (proposal: Proposal) => void;
 };
 
-export function ProposalsTable({ proposals }: ProposalsTableProps) {
+export function ProposalsTable({ proposals, onRowClick }: ProposalsTableProps) {
   // For demo: treat proposals with status ASSINADO as 'newly signed' (show indicator)
   // and proposals with status AGUARDANDO as 'new'.
   return (
@@ -28,7 +29,18 @@ export function ProposalsTable({ proposals }: ProposalsTableProps) {
         </thead>
         <tbody>
           {proposals.map((proposal) => (
-            <tr key={proposal.id}>
+            <tr
+              key={proposal.id}
+              onClick={() => onRowClick?.(proposal)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onRowClick?.(proposal);
+                }
+              }}
+              tabIndex={0}
+              role="button"
+            >
               <td>
                 <ProposalCellContent>
                   {proposal.status === "AGUARDANDO" && (

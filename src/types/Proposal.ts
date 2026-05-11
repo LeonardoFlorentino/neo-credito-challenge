@@ -5,6 +5,13 @@ export enum ProposalStatus {
   EXPIRADO = "EXPIRADO",
 }
 
+export interface ContactAttempt {
+  id: string;
+  channel: "WHATSAPP" | "SMS" | "EMAIL" | "LIGACAO";
+  timestamp: string;
+  outcome: "SUCESSO" | "SEM_RESPOSTA" | "FALHA";
+}
+
 export interface Dossie {
   selfieUrl: string;
   documentoUrl: string;
@@ -22,6 +29,9 @@ export interface Proposal {
   nomeCliente: string;
   status: ProposalStatus;
   dataUltimoEvento: string;
+  assinaturaUrl: string;
+  dataEnvio: string;
+  tentativasContato: ContactAttempt[];
   dossie: Dossie;
 }
 

@@ -7,6 +7,22 @@ export const proposalsMock: Proposal[] = [
     nomeCliente: "Carlos Lima",
     status: ProposalStatus.AGUARDANDO,
     dataUltimoEvento: "2026-05-11T08:30:00.000Z",
+    assinaturaUrl: "https://assinatura.neo-credito.local/NC-2026-0001",
+    dataEnvio: "2026-05-10T13:20:00.000Z",
+    tentativasContato: [
+      {
+        id: "1-1",
+        channel: "WHATSAPP",
+        timestamp: "2026-05-10T13:30:00.000Z",
+        outcome: "SEM_RESPOSTA",
+      },
+      {
+        id: "1-2",
+        channel: "LIGACAO",
+        timestamp: "2026-05-10T17:05:00.000Z",
+        outcome: "SUCESSO",
+      },
+    ],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/1/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/1/documento.pdf",
@@ -24,6 +40,22 @@ export const proposalsMock: Proposal[] = [
     nomeCliente: "Mariana Alves",
     status: ProposalStatus.ASSINADO,
     dataUltimoEvento: "2026-05-10T19:15:00.000Z",
+    assinaturaUrl: "https://assinatura.neo-credito.local/NC-2026-0002",
+    dataEnvio: "2026-05-09T11:40:00.000Z",
+    tentativasContato: [
+      {
+        id: "2-1",
+        channel: "EMAIL",
+        timestamp: "2026-05-09T11:42:00.000Z",
+        outcome: "SUCESSO",
+      },
+      {
+        id: "2-2",
+        channel: "SMS",
+        timestamp: "2026-05-09T11:50:00.000Z",
+        outcome: "SUCESSO",
+      },
+    ],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/2/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/2/documento.pdf",
@@ -41,6 +73,22 @@ export const proposalsMock: Proposal[] = [
     nomeCliente: "Joao Pereira",
     status: ProposalStatus.RECUSADO,
     dataUltimoEvento: "2026-05-09T10:05:00.000Z",
+    assinaturaUrl: "https://assinatura.neo-credito.local/NC-2026-0003",
+    dataEnvio: "2026-05-08T09:10:00.000Z",
+    tentativasContato: [
+      {
+        id: "3-1",
+        channel: "SMS",
+        timestamp: "2026-05-08T09:20:00.000Z",
+        outcome: "FALHA",
+      },
+      {
+        id: "3-2",
+        channel: "LIGACAO",
+        timestamp: "2026-05-08T12:00:00.000Z",
+        outcome: "SEM_RESPOSTA",
+      },
+    ],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/3/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/3/documento.pdf",
@@ -58,6 +106,22 @@ export const proposalsMock: Proposal[] = [
     nomeCliente: "Ana Beatriz Costa",
     status: ProposalStatus.EXPIRADO,
     dataUltimoEvento: "2026-05-05T14:40:00.000Z",
+    assinaturaUrl: "https://assinatura.neo-credito.local/NC-2026-0004",
+    dataEnvio: "2026-05-03T08:00:00.000Z",
+    tentativasContato: [
+      {
+        id: "4-1",
+        channel: "EMAIL",
+        timestamp: "2026-05-03T08:10:00.000Z",
+        outcome: "SEM_RESPOSTA",
+      },
+      {
+        id: "4-2",
+        channel: "WHATSAPP",
+        timestamp: "2026-05-04T15:55:00.000Z",
+        outcome: "FALHA",
+      },
+    ],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/4/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/4/documento.pdf",
