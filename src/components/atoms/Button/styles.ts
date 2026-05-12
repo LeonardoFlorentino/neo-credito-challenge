@@ -6,6 +6,10 @@ export const StyledButton = styled.button<{
   $variant: ButtonVariant;
   $loading: boolean;
 }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border: 0;
   border-radius: 8px;
   padding: 10px 16px;
@@ -28,8 +32,8 @@ export const StyledButton = styled.button<{
   ${({ $variant, theme }) =>
     $variant === "secondary" &&
     css`
-      background: ${theme.colors.secondary};
-      color: ${theme.colors.onSecondary};
+      background: ${theme.colors.danger};
+      color: ${theme.colors.onPrimary};
 
       &:hover:not(:disabled) {
         opacity: 0.92;

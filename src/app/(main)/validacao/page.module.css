@@ -4,7 +4,7 @@
 }
 
 .subtitle {
-  color: #4b5563;
+  color: var(--app-text-soft);
 }
 
 .summaryGrid {
@@ -14,9 +14,9 @@
 }
 
 .summaryCard {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--app-border);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--app-surface);
   padding: 12px;
   display: grid;
   gap: 6px;
@@ -26,13 +26,13 @@
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #4b5563;
+  color: var(--app-text-soft);
   font-weight: 600;
 }
 
 .summaryValue {
   font-size: 22px;
-  color: #0b1f3a;
+  color: var(--app-text);
   line-height: 1;
 }
 
@@ -50,18 +50,21 @@
 }
 
 .card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--app-border);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--app-surface);
   padding: 14px;
   display: grid;
   gap: 12px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .card:hover {
   transform: translateY(-1px);
-  border-color: #cbd5e1;
+  border-color: var(--app-border-strong);
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
 }
 
@@ -80,13 +83,13 @@
 .cardTitle {
   margin: 0;
   font-size: 18px;
-  color: #0b1f3a;
+  color: var(--app-text);
   line-height: 1.25;
 }
 
 .cardSubtitle {
   margin: 0;
-  color: #374151;
+  color: var(--app-text-soft);
   font-size: 14px;
 }
 
@@ -102,18 +105,21 @@
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--app-text-muted);
 }
 
 .metaValue {
   margin: 2px 0 0;
-  color: #1f2937;
+  color: var(--app-text);
   font-size: 14px;
 }
 
 .openHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   justify-self: end;
-  color: #0b1f3a;
+  color: var(--app-link);
   font-weight: 600;
   font-size: 13px;
 }

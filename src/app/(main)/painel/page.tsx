@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/atoms/Button";
 import { Skeleton } from "@/components/atoms/Skeleton";
@@ -16,7 +17,9 @@ export default function PainelPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState<ProposalStatus | "ALL">("ALL");
-  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
+  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(
+    null,
+  );
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -28,15 +31,22 @@ export default function PainelPage() {
 
   const filteredProposals = useMemo(
     () =>
-      proposals.filter((proposal) => {
-        const matchesSearch =
-          proposal.nomeCliente.toLowerCase().includes(debouncedSearch) ||
-          proposal.numeroProposta.toLowerCase().includes(debouncedSearch);
+      proposals
+        .filter((proposal) => {
+          const matchesSearch =
+            proposal.nomeCliente.toLowerCase().includes(debouncedSearch) ||
+            proposal.numeroProposta.toLowerCase().includes(debouncedSearch);
 
-        const matchesStatus = status === "ALL" || proposal.status === status;
+          const matchesStatus =
+            status === "ALL" || proposal.status === status;
 
-        return matchesSearch && matchesStatus;
-      }),
+          return matchesSearch && matchesStatus;
+        })
+        .sort(
+          (a, b) =>
+            new Date(b.dataUltimoEvento).getTime() -
+            new Date(a.dataUltimoEvento).getTime(),
+        ),
     [proposals, debouncedSearch, status],
   );
 
@@ -59,6 +69,7 @@ export default function PainelPage() {
           {error}
         </Typography>
         <Button style={{ marginTop: "16px" }} onClick={() => void retry()}>
+          <RotateCcw size={16} aria-hidden="true" />
           Tentar novamente
         </Button>
       </div>

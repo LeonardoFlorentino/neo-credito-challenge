@@ -3,6 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
+import {
+  CheckCircle2,
+  ClipboardCheck,
+  ExternalLink,
+  FileWarning,
+  RotateCcw,
+  ShieldAlert,
+  XCircle,
+} from "lucide-react";
 
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
@@ -28,7 +37,8 @@ function formatResultado(resultado: "SUCESSO" | "SEM_RESPOSTA" | "FALHA") {
 
 export default function ValidacaoPorIdPage() {
   const params = useParams<{ id: string }>();
-  const { proposals, isLoading, error, retry, updateProposalStatus } = useProposals();
+  const { proposals, isLoading, error, retry, updateProposalStatus } =
+    useProposals();
   const id = typeof params?.id === "string" ? params.id : "";
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
@@ -70,7 +80,10 @@ export default function ValidacaoPorIdPage() {
       <div className={styles.container}>
         <Typography variant="h1">Validação da Proposta</Typography>
         <Typography variant="body">{error}</Typography>
-        <Button onClick={() => void retry()}>Tentar novamente</Button>
+        <Button onClick={() => void retry()}>
+          <RotateCcw size={16} aria-hidden="true" />
+          Tentar novamente
+        </Button>
       </div>
     );
   }
@@ -94,7 +107,10 @@ export default function ValidacaoPorIdPage() {
   };
 
   const handleConfirmReject = () => {
-    const hasUpdated = updateProposalStatus(proposta.id, ProposalStatus.RECUSADO);
+    const hasUpdated = updateProposalStatus(
+      proposta.id,
+      ProposalStatus.RECUSADO,
+    );
 
     if (!hasUpdated) {
       return;
@@ -113,7 +129,14 @@ export default function ValidacaoPorIdPage() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <Typography variant="h1">Validação da Proposta</Typography>
+        <Typography variant="h1" className={styles.titleWithIcon}>
+          <ClipboardCheck
+            size={26}
+            className={styles.titleIcon}
+            aria-hidden="true"
+          />
+          Validação da Proposta
+        </Typography>
         <div className={styles.statusRow}>
           <Typography variant="body">{proposta.numeroProposta}</Typography>
           <Badge variant={proposta.status}>{proposta.status}</Badge>
@@ -157,7 +180,8 @@ export default function ValidacaoPorIdPage() {
           <div className={styles.field}>
             <span className={styles.label}>Geolocalização</span>
             <span className={styles.value}>
-              {proposta.dossie.geolocalizacao.lat}, {proposta.dossie.geolocalizacao.lng}
+              {proposta.dossie.geolocalizacao.lat},{" "}
+              {proposta.dossie.geolocalizacao.lng}
             </span>
           </div>
 
@@ -179,14 +203,19 @@ export default function ValidacaoPorIdPage() {
                 proposta.status === ProposalStatus.RECUSADO
               }
             >
+              <CheckCircle2 size={16} aria-hidden="true" />
               Aprovar validação
             </Button>
-            <Button variant="ghost">Solicitar novo documento</Button>
+            <Button variant="ghost">
+              <FileWarning size={16} aria-hidden="true" />
+              Solicitar novo documento
+            </Button>
             <Button
               variant="secondary"
               onClick={() => setShowRejectModal(true)}
               disabled={proposta.status === ProposalStatus.RECUSADO}
             >
+              <ShieldAlert size={16} aria-hidden="true" />
               Reprovar proposta
             </Button>
             <Link
@@ -195,6 +224,7 @@ export default function ValidacaoPorIdPage() {
               target="_blank"
               rel="noreferrer noopener"
             >
+              <ExternalLink size={16} aria-hidden="true" />
               Abrir assinatura digital
             </Link>
           </div>
@@ -243,7 +273,10 @@ export default function ValidacaoPorIdPage() {
               Deseja enviar esta proposta para auditoria?
             </Typography>
             <div className={styles.modalActions}>
-              <Button variant="ghost" onClick={() => setShowApproveModal(false)}>
+              <Button
+                variant="ghost"
+                onClick={() => setShowApproveModal(false)}
+              >
                 Cancelar
               </Button>
               <Button variant="primary" onClick={handleConfirmApprove}>
@@ -271,7 +304,8 @@ export default function ValidacaoPorIdPage() {
               Informar Pendência
             </Typography>
             <Typography variant="body">
-              Selecione o motivo e descreva a pendência para reprovar a proposta.
+              Selecione o motivo e descreva a pendência para reprovar a
+              proposta.
             </Typography>
 
             <label className={styles.modalField}>
@@ -283,8 +317,12 @@ export default function ValidacaoPorIdPage() {
               >
                 <option value="">Selecione um motivo</option>
                 <option value="DOCUMENTO_ILEGIVEL">Documento ilegível</option>
-                <option value="DIVERGENCIA_BIOMETRICA">Divergência biométrica</option>
-                <option value="DADOS_INCONSISTENTES">Dados inconsistentes</option>
+                <option value="DIVERGENCIA_BIOMETRICA">
+                  Divergência biométrica
+                </option>
+                <option value="DADOS_INCONSISTENTES">
+                  Dados inconsistentes
+                </option>
                 <option value="SUSPEITA_FRAUDE">Suspeita de fraude</option>
               </select>
             </label>
@@ -309,6 +347,7 @@ export default function ValidacaoPorIdPage() {
                 onClick={handleConfirmReject}
                 disabled={!isRejectFormValid}
               >
+                <XCircle size={16} aria-hidden="true" />
                 Confirmar reprovação
               </Button>
             </div>

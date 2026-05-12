@@ -1,6 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import {
+  ArrowUpRight,
+  RotateCcw,
+} from "lucide-react";
 
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
@@ -55,7 +59,10 @@ export default function ValidacaoPage() {
       <section className={styles.container}>
         <Typography variant="h1">Validação Operacional</Typography>
         <Typography variant="body">{error}</Typography>
-        <Button onClick={() => void retry()}>Tentar novamente</Button>
+        <Button onClick={() => void retry()}>
+          <RotateCcw size={16} aria-hidden="true" />
+          Tentar novamente
+        </Button>
       </section>
     );
   }
@@ -96,12 +103,19 @@ export default function ValidacaoPage() {
       <ul className={styles.list}>
         {proposals.map((proposal) => (
           <li key={proposal.id}>
-            <Link className={styles.cardLink} href={`/validacao/${proposal.id}`}>
+            <Link
+              className={styles.cardLink}
+              href={`/validacao/${proposal.id}`}
+            >
               <article className={styles.card}>
                 <header className={styles.cardHeader}>
                   <div className={styles.cardTitleBlock}>
-                    <h2 className={styles.cardTitle}>{proposal.numeroProposta}</h2>
-                    <p className={styles.cardSubtitle}>{proposal.nomeCliente}</p>
+                    <h2 className={styles.cardTitle}>
+                      {proposal.numeroProposta}
+                    </h2>
+                    <p className={styles.cardSubtitle}>
+                      {proposal.nomeCliente}
+                    </p>
                   </div>
                   <Badge variant={proposal.status}>
                     {getStatusLabel(proposal.status)}
@@ -121,7 +135,9 @@ export default function ValidacaoPage() {
                   </div>
                 </dl>
 
-                <span className={styles.openHint}>Abrir validação</span>
+                <span className={styles.openHint}>
+                  <ArrowUpRight size={14} aria-hidden="true" /> Abrir validação
+                </span>
               </article>
             </Link>
           </li>
