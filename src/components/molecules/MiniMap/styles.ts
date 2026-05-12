@@ -1,13 +1,17 @@
 import styled from "styled-components";
 
 export const MiniMapContainer = styled.div`
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: ${({ theme }) => theme.spacing.sm};
+  flex: 1;
+  min-height: 0;
 `;
 
 export const MiniMapFrame = styled.div`
   position: relative;
   width: 100%;
+  flex: 1;
   min-height: 180px;
   border-radius: 12px;
   overflow: hidden;
@@ -18,7 +22,7 @@ export const MiniMapFrame = styled.div`
 
 export const MiniMapIframe = styled.iframe`
   width: 100%;
-  height: 220px;
+  height: 100%;
   border: 0;
 `;
 

@@ -52,7 +52,7 @@ describe("ProposalsTable", () => {
     expect(screen.getByText("Carlos Lima")).toBeInTheDocument();
     expect(screen.getByText("ASSINADO")).toBeInTheDocument();
     expect(screen.getByText("Novo")).toBeInTheDocument();
-    expect(screen.getByTitle("Concluído")).toBeInTheDocument();
+    expect(screen.getByTitle("Assinatura concluída")).toBeInTheDocument();
   });
 
   it("calls onRowClick when a row is clicked", async () => {

@@ -17,8 +17,8 @@ export const StatusIndicator = styled.span`
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: ${({ theme }) => theme.colors.secondary};
-  box-shadow: 0 0 0 0 ${({ theme }) => theme.colors.secondary};
+  background: #f2b705;
+  box-shadow: 0 0 0 0 rgba(242, 183, 5, 0.7);
   animation: ${pulse} 1.2s infinite;
 `;
 

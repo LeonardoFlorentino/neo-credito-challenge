@@ -13,7 +13,8 @@ import { useProposals } from "@/hooks/useProposals";
 import { Proposal, ProposalStatus } from "@/types/Proposal";
 
 export default function PainelPage() {
-  const { proposals, isLoading, error, retry } = useProposals();
+  const { proposals, isLoading, error, retry, refresh, lastUpdatedAt } =
+    useProposals();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState<ProposalStatus | "ALL">("ALL");
@@ -82,6 +83,26 @@ export default function PainelPage() {
       <Typography variant="body">
         Bem-vindo ao painel de controle de propostas.
       </Typography>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "12px",
+          marginTop: "8px",
+        }}
+      >
+        <Typography variant="caption">
+          Atualização automática a cada 15s
+          {lastUpdatedAt
+            ? ` • Última atualização: ${lastUpdatedAt.toLocaleTimeString("pt-BR")}`
+            : ""}
+        </Typography>
+        <Button variant="ghost" onClick={() => void refresh()}>
+          <RotateCcw size={16} aria-hidden="true" />
+          Atualizar agora
+        </Button>
+      </div>
       <FilterBar
         search={search}
         status={status}

@@ -14,8 +14,6 @@ type ProposalsTableProps = {
 };
 
 export function ProposalsTable({ proposals, onRowClick }: ProposalsTableProps) {
-  // For demo: treat proposals with status ASSINADO as 'newly signed' (show indicator)
-  // and proposals with status AGUARDANDO as 'new'.
   return (
     <TableContainer>
       <Table>
@@ -47,7 +45,7 @@ export function ProposalsTable({ proposals, onRowClick }: ProposalsTableProps) {
                     <NewIndicator>Novo</NewIndicator>
                   )}
                   {proposal.status === "ASSINADO" && (
-                    <StatusIndicator title="Concluído" />
+                    <StatusIndicator title="Assinatura concluída" />
                   )}
                   <span>{proposal.numeroProposta}</span>
                 </ProposalCellContent>

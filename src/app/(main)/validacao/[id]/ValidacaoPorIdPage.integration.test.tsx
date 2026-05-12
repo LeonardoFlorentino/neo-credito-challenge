@@ -30,7 +30,7 @@ function createProposal(overrides: Partial<Proposal>): Proposal {
     numeroProposta: "NC-2026-0001",
     nomeCliente: "Carlos Lima",
     cpfCliente: "123.456.789-10",
-    status: ProposalStatus.AGUARDANDO,
+    status: ProposalStatus.ASSINADO,
     dataUltimoEvento: "2026-05-11T12:00:00.000Z",
     assinaturaUrl: "https://assinatura.neo-credito.local/NC-2026-0001",
     dataEnvio: "2026-05-10T13:20:00.000Z",
@@ -68,7 +68,7 @@ describe("ValidacaoPorIdPage US-02 integration", () => {
     const updateProposalStatus = jest.fn().mockReturnValue(true);
 
     useProposals.mockReturnValue({
-      proposals: [createProposal({ status: ProposalStatus.AGUARDANDO })],
+      proposals: [createProposal({ status: ProposalStatus.ASSINADO })],
       isLoading: false,
       error: null,
       retry: jest.fn(),
@@ -101,7 +101,7 @@ describe("ValidacaoPorIdPage US-02 integration", () => {
     const updateProposalStatus = jest.fn().mockReturnValue(true);
 
     useProposals.mockReturnValue({
-      proposals: [createProposal({ status: ProposalStatus.AGUARDANDO })],
+      proposals: [createProposal({ status: ProposalStatus.ASSINADO })],
       isLoading: false,
       error: null,
       retry: jest.fn(),
@@ -135,6 +135,30 @@ describe("ValidacaoPorIdPage US-02 integration", () => {
     expect(updateProposalStatus).toHaveBeenCalledWith("1", ProposalStatus.RECUSADO);
     expect(screen.getByText("Proposta atualizada para RECUSADO.")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Informar Pendência" })).not.toBeInTheDocument();
+  });
+
+  it("keeps approval and rejection disabled when proposal is not signed", () => {
+    useProposals.mockReturnValue({
+      proposals: [createProposal({ status: ProposalStatus.AGUARDANDO })],
+      isLoading: false,
+      error: null,
+      retry: jest.fn(),
+      updateProposalStatus: jest.fn(),
+    });
+
+    renderWithTheme(<ValidacaoPorIdPage />);
+
+    expect(
+      screen.getByRole("button", { name: "Aprovar validação" }),
+    ).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Reprovar proposta" }),
+    ).toBeDisabled();
+    expect(
+      screen.getByText(
+        "A validação do dossiê fica habilitada apenas quando a proposta estiver com status ASSINADO.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("renders loading state with skeleton placeholders", () => {

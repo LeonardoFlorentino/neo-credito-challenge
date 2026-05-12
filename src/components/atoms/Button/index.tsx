@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from "react";
+import { forwardRef, type ButtonHTMLAttributes } from "react";
 
 import { StyledButton } from "./styles";
 
@@ -9,21 +9,23 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   loading?: boolean;
 };
 
-export function Button({
-  children,
-  variant = "primary",
-  loading = false,
-  disabled = false,
-  ...props
-}: ButtonProps) {
-  return (
-    <StyledButton
-      $variant={variant}
-      $loading={loading}
-      disabled={disabled || loading}
-      {...props}
-    >
-      {loading ? "Carregando..." : children}
-    </StyledButton>
-  );
-}
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    { children, variant = "primary", loading = false, disabled = false, ...props },
+    ref,
+  ) => {
+    return (
+      <StyledButton
+        ref={ref}
+        $variant={variant}
+        $loading={loading}
+        disabled={disabled || loading}
+        {...props}
+      >
+        {loading ? "Carregando..." : children}
+      </StyledButton>
+    );
+  },
+);
+
+Button.displayName = "Button";

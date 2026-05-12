@@ -59,6 +59,8 @@ describe("PainelPage integration", () => {
       proposals,
       isLoading: false,
       error: null,
+      lastUpdatedAt: new Date("2026-05-11T12:00:00.000Z"),
+      refresh: jest.fn(),
       retry: jest.fn(),
       updateProposalStatus: jest.fn(),
     });
@@ -110,6 +112,8 @@ describe("PainelPage integration", () => {
       proposals: [],
       isLoading: true,
       error: null,
+      lastUpdatedAt: null,
+      refresh: jest.fn(),
       retry: jest.fn(),
       updateProposalStatus: jest.fn(),
     });
@@ -130,6 +134,8 @@ describe("PainelPage integration", () => {
       proposals: [],
       isLoading: false,
       error: "Não foi possível carregar as propostas.",
+      lastUpdatedAt: null,
+      refresh: jest.fn(),
       retry,
       updateProposalStatus: jest.fn(),
     });

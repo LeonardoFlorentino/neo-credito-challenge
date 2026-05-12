@@ -11,18 +11,27 @@ export function useProposals() {
   const [proposals, setProposals] = useState(() => [...proposalsMock]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
 
-  const loadProposals = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  const loadProposals = useCallback(async (background = false) => {
+    if (!background) {
+      setIsLoading(true);
+      setError(null);
+    }
 
     try {
       const data = await fetchProposalsMock();
       setProposals(data);
+      setError(null);
+      setLastUpdatedAt(new Date());
     } catch {
-      setError("Não foi possível carregar as propostas.");
+      if (!background) {
+        setError("Não foi possível carregar as propostas.");
+      }
     } finally {
-      setIsLoading(false);
+      if (!background) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
@@ -33,6 +42,16 @@ export function useProposals() {
 
     return () => {
       clearTimeout(timeoutId);
+    };
+  }, [loadProposals]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      void loadProposals(true);
+    }, 15000);
+
+    return () => {
+      clearInterval(intervalId);
     };
   }, [loadProposals]);
 
@@ -55,5 +74,13 @@ export function useProposals() {
     [],
   );
 
-  return { proposals, isLoading, error, retry: loadProposals, updateProposalStatus };
+  return {
+    proposals,
+    isLoading,
+    error,
+    lastUpdatedAt,
+    retry: () => loadProposals(),
+    refresh: () => loadProposals(true),
+    updateProposalStatus,
+  };
 }

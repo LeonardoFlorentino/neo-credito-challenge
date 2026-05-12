@@ -3,14 +3,14 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: #f4f6f8;
+  background: var(--app-surface-soft);
 }
 
 .card {
   width: min(100%, 560px);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--app-border);
   border-radius: 14px;
-  background: #ffffff;
+  background: var(--app-surface);
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
   padding: 20px;
   display: grid;
@@ -21,29 +21,30 @@
   margin: 0;
   font-size: 22px;
   line-height: 1.25;
-  color: #0b1f3a;
+  color: var(--app-text);
 }
 
 .description {
   margin: 0;
-  color: #374151;
+  color: var(--app-text-soft);
   line-height: 1.5;
 }
 
 .action {
   justify-self: start;
-  border: 0;
+  border: 1px solid var(--app-border-strong);
   border-radius: 8px;
-  background: #0b1f3a;
-  color: #ffffff;
+  background: var(--app-link);
+  color: var(--app-on-success);
   font-weight: 600;
   padding: 10px 14px;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .action:hover {
   opacity: 0.92;
+  transform: translateY(-1px);
 }
 
 .skeletonGrid {

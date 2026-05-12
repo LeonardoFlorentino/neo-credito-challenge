@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import {
+  ArrowLeft,
   CheckCircle2,
   ClipboardCheck,
   ExternalLink,
@@ -85,6 +87,10 @@ export default function ValidacaoPorIdPage() {
     src: string;
     alt: string;
   } | null>(null);
+  const approveCancelButtonRef = useRef<HTMLButtonElement>(null);
+  const rejectReasonRef = useRef<HTMLSelectElement>(null);
+  const zoomCloseButtonRef = useRef<HTMLButtonElement>(null);
+  const lastFocusedElementRef = useRef<HTMLElement | null>(null);
   const proposta = proposals.find((item) => item.id === id);
 
   useEffect(() => {
@@ -100,6 +106,63 @@ export default function ValidacaoPorIdPage() {
       window.clearTimeout(timeoutId);
     };
   }, [showSuccessToast]);
+
+  useEffect(() => {
+    const isAnyModalOpen =
+      showApproveModal || showRejectModal || zoomImage !== null;
+
+    if (!isAnyModalOpen) {
+      return;
+    }
+
+    lastFocusedElementRef.current = document.activeElement as HTMLElement;
+    document.body.style.overflow = "hidden";
+
+    const focusTimeoutId = window.setTimeout(() => {
+      if (showApproveModal) {
+        approveCancelButtonRef.current?.focus();
+        return;
+      }
+
+      if (showRejectModal) {
+        rejectReasonRef.current?.focus();
+        return;
+      }
+
+      if (zoomImage) {
+        zoomCloseButtonRef.current?.focus();
+      }
+    }, 0);
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      if (zoomImage) {
+        setZoomImage(null);
+        return;
+      }
+
+      if (showRejectModal) {
+        setShowRejectModal(false);
+        return;
+      }
+
+      if (showApproveModal) {
+        setShowApproveModal(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscapeKey);
+
+    return () => {
+      window.clearTimeout(focusTimeoutId);
+      window.removeEventListener("keydown", handleEscapeKey);
+      document.body.style.overflow = "";
+      lastFocusedElementRef.current?.focus();
+    };
+  }, [showApproveModal, showRejectModal, zoomImage]);
 
   if (isLoading) {
     return (
@@ -172,9 +235,16 @@ export default function ValidacaoPorIdPage() {
   );
   const selfiePreview = proposta.dossie.selfieUrl;
   const documentPreview = proposta.dossie.documentoUrl;
+  const isDataImage = (src: string) => src.startsWith("data:");
+  const canReviewProposal = proposta.status === ProposalStatus.ASSINADO;
 
   return (
     <div className={styles.container}>
+      <Link href="/validacao" className={styles.backLink}>
+        <ArrowLeft size={16} aria-hidden="true" />
+        Voltar para validação operacional
+      </Link>
+
       <header className={styles.header}>
         <Typography variant="h1" className={styles.titleWithIcon}>
           <ClipboardCheck
@@ -191,7 +261,34 @@ export default function ValidacaoPorIdPage() {
       </header>
 
       <section className={styles.grid}>
-        <article className={`${styles.card} ${styles.cardWide}`}>
+        {/* Coluna 1 — Selfie */}
+        <article className={`${styles.card} ${styles.cardThird} ${styles.cardSelfie}`}>
+          <button
+            type="button"
+            className={styles.selfieButton}
+            onClick={() =>
+              setZoomImage({ src: selfiePreview, alt: "Selfie do assinante" })
+            }
+          >
+            <div className={styles.selfieImageWrap}>
+              <Image
+                className={styles.selfieImage}
+                src={selfiePreview}
+                alt="Selfie do assinante"
+                fill
+                sizes="(max-width: 900px) 100vw, 33vw"
+                unoptimized={isDataImage(selfiePreview)}
+              />
+            </div>
+            <span className={styles.selfieCaption}>
+              <ZoomIn size={14} aria-hidden="true" />
+              Ampliar selfie
+            </span>
+          </button>
+        </article>
+
+        {/* Coluna 2 — Dados do Assinante + Documento */}
+        <article className={`${styles.card} ${styles.cardThird}`}>
           <Typography variant="h2">Dados do Assinante</Typography>
 
           <div className={styles.subscriberGrid}>
@@ -221,65 +318,48 @@ export default function ValidacaoPorIdPage() {
             </div>
           </div>
 
-          <div className={styles.mediaGrid}>
-            <button
-              type="button"
-              className={styles.mediaCard}
-              onClick={() =>
-                setZoomImage({
-                  src: selfiePreview,
-                  alt: "Selfie do assinante",
-                })
-              }
-            >
-              <img
-                className={styles.mediaImage}
-                src={selfiePreview}
-                alt="Selfie do assinante"
-              />
-              <span className={styles.mediaCaption}>
-                <ZoomIn size={14} aria-hidden="true" />
-                Ampliar selfie
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className={styles.mediaCard}
-              onClick={() =>
-                setZoomImage({
-                  src: documentPreview,
-                  alt: "Documento do assinante",
-                })
-              }
-            >
-              <img
+          <button
+            type="button"
+            className={`${styles.mediaCard} ${styles.mediaCardGrow}`}
+            onClick={() =>
+              setZoomImage({
+                src: documentPreview,
+                alt: "Documento do assinante",
+              })
+            }
+          >
+            <div className={styles.mediaImageWrap}>
+              <Image
                 className={styles.mediaImage}
                 src={documentPreview}
                 alt="Documento do assinante"
+                fill
+                sizes="(max-width: 900px) 100vw, 33vw"
+                unoptimized={isDataImage(documentPreview)}
               />
-              <span className={styles.mediaCaption}>
-                <ZoomIn size={14} aria-hidden="true" />
-                Ampliar documento
-              </span>
-            </button>
-          </div>
+            </div>
+            <span className={styles.mediaCaption}>
+              <ZoomIn size={14} aria-hidden="true" />
+              Ampliar documento
+            </span>
+          </button>
         </article>
 
-        <article className={`${styles.card} ${styles.cardMedium}`}>
+        {/* Coluna 3 — Análise de Identidade */}
+        <article className={`${styles.card} ${styles.cardThird}`}>
           <Typography variant="h2">Análise de Identidade</Typography>
 
           <SimilarityScore value={proposta.dossie.similaridade} />
 
-          <div className={styles.locationBlock}>
-            <div className={styles.field}>
-              <span className={styles.label}>Geolocalização</span>
-              <span className={styles.value}>
-                {proposta.dossie.geolocalizacao.lat},{" "}
-                {proposta.dossie.geolocalizacao.lng}
-              </span>
-            </div>
+          <div className={styles.field}>
+            <span className={styles.label}>Geolocalização</span>
+            <span className={styles.value}>
+              {proposta.dossie.geolocalizacao.lat},{" "}
+              {proposta.dossie.geolocalizacao.lng}
+            </span>
+          </div>
 
+          <div className={styles.mapGrow}>
             <MiniMap
               lat={proposta.dossie.geolocalizacao.lat}
               lng={proposta.dossie.geolocalizacao.lng}
@@ -295,6 +375,7 @@ export default function ValidacaoPorIdPage() {
               variant="success"
               onClick={() => setShowApproveModal(true)}
               disabled={
+                !canReviewProposal ||
                 proposta.status === ProposalStatus.AGUARDANDO_AUDITORIA ||
                 proposta.status === ProposalStatus.RECUSADO
               }
@@ -305,7 +386,7 @@ export default function ValidacaoPorIdPage() {
             <Button
               variant="secondary"
               onClick={() => setShowRejectModal(true)}
-              disabled={proposta.status === ProposalStatus.RECUSADO}
+              disabled={!canReviewProposal || proposta.status === ProposalStatus.RECUSADO}
             >
               <ShieldAlert size={16} aria-hidden="true" />
               Reprovar proposta
@@ -324,6 +405,13 @@ export default function ValidacaoPorIdPage() {
               Abrir assinatura digital
             </Link>
           </div>
+
+          {!canReviewProposal && (
+            <Typography variant="caption" className={styles.reviewHint}>
+              A validação do dossiê fica habilitada apenas quando a proposta
+              estiver com status ASSINADO.
+            </Typography>
+          )}
 
           <Typography variant="body">Log de tentativas de contato</Typography>
 
@@ -371,6 +459,7 @@ export default function ValidacaoPorIdPage() {
             <div className={styles.modalActions}>
               <Button
                 variant="ghost"
+                ref={approveCancelButtonRef}
                 onClick={() => setShowApproveModal(false)}
               >
                 Cancelar
@@ -407,6 +496,7 @@ export default function ValidacaoPorIdPage() {
             <label className={styles.modalField}>
               <span className={styles.label}>Motivo</span>
               <select
+                ref={rejectReasonRef}
                 className={styles.modalInput}
                 value={pendingReason}
                 onChange={(event) => setPendingReason(event.target.value)}
@@ -470,13 +560,20 @@ export default function ValidacaoPorIdPage() {
             aria-modal="true"
             aria-label={zoomImage.alt}
           >
-            <img
+            <Image
               className={styles.zoomImage}
               src={zoomImage.src}
               alt={zoomImage.alt}
+              width={1400}
+              height={900}
+              unoptimized={isDataImage(zoomImage.src)}
             />
             <div className={styles.modalActions}>
-              <Button variant="ghost" onClick={() => setZoomImage(null)}>
+              <Button
+                variant="ghost"
+                ref={zoomCloseButtonRef}
+                onClick={() => setZoomImage(null)}
+              >
                 Fechar
               </Button>
             </div>

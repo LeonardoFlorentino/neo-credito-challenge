@@ -135,6 +135,16 @@ npm run build
 npm start
 ```
 
+## O que faria com mais tempo
+
+- **Testes de integração para US-02** — a tela `/validacao/[id]` não possui testes automatizados. Cobriria os fluxos de aprovação, reprovação, validação do formulário de pendência e feedback de toast.
+- **`next/image` no lugar de `<img>`** — substituiria as três ocorrências de `<img>` para aproveitar otimização de LCP, lazy loading automático e redução de largura de banda.
+- **Paginação ou scroll infinito** — a listagem de propostas carrega tudo de uma vez; em produção com volumes reais seria necessário paginar.
+- **Filtro pré-aplicado em Validação Operacional** — a rota `/validacao` exibiria por padrão apenas propostas com status `ASSINADO`, pois são as únicas acionáveis pelo Operador naquele módulo.
+- **Tratamento de sessão / autenticação** — simular papéis de usuário (CORBAN vs. Operador) com redirecionamento por perfil, alinhando o sistema ao fluxo de três atores descrito no desafio.
+- **Cache e revalidação** — usar `stale-while-revalidate` ou React Query para manter a listagem sincronizada sem polling manual.
+- **Acessibilidade aprimorada** — adicionar `aria-live` nos toasts e garantir foco gerenciado nos modais para usuários de teclado e leitores de tela.
+
 ## Escopo
 
 Projeto com finalidade avaliativa. Não representa integralmente requisitos de produção, como segurança, compliance, observabilidade e operação em escala.
