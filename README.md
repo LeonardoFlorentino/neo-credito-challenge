@@ -1,9 +1,20 @@
-# Desafio Técnico Neo Crédito
+# [Neo Crédito](https://neocredito.com.br/) Challenge
 
-Aplicação frontend em Next.js para simular o fluxo de validação e assinatura eletrônica de propostas de crédito.
+<a href="https://neo-credito-challenge.vercel.app/painel" target="_blank">
+	<img src="https://img.shields.io/badge/vercel-frontend-success?logo=vercel&labelColor=111111&color=43b581" alt="Vercel Frontend Deploy" />
+</a>
+
+## Visão Geral
 
 <p align="center">
-	<b>Frontend challenge para fluxo de propostas de crédito com validação, assinatura e feedback global de estados</b><br/>
+	<b>Para testar a aplicação, basta acessar o frontend publicado em:<br/>
+	<a href="https://neo-credito-challenge.vercel.app/painel" target="_blank">https://neo-credito-challenge.vercel.app/painel</a></b>
+</p>
+
+Este repositório contém o desafio técnico frontend da Neo Crédito, focado no fluxo de validação operacional de propostas, análise de dossiê e acompanhamento de status até a assinatura eletrônica.
+
+<p align="center">
+	<b>Stack principal do projeto</b><br/>
 	<img src="https://img.shields.io/badge/Platform-Web-0f172a" alt="Web" />
 	<img src="https://img.shields.io/badge/Next.js-16.x-000000?logo=next.js" alt="Next.js" />
 	<img src="https://img.shields.io/badge/React-19.x-61dafb?logo=react" alt="React" />
@@ -75,16 +86,6 @@ stateDiagram-v2
 		Expirada --> [*]
 		Concluida --> [*]
 ```
-
-## Notas de Desenvolvimento
-
-As anotações de apoio técnico ficam em [src/dev-notes/](src/dev-notes/) e são ignoradas no versionamento Git, junto com [dev-notes/](dev-notes/).
-
-Essas notas costumam reunir:
-
-- contexto de etapas e decisões;
-- critérios de implementação;
-- observações sobre fluxos e cobertura de testes.
 
 ## Instalação e Execução
 

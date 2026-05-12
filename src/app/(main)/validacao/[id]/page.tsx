@@ -196,7 +196,7 @@ export default function ValidacaoPorIdPage() {
 
           <div className={styles.actions}>
             <Button
-              variant="primary"
+              variant="success"
               onClick={() => setShowApproveModal(true)}
               disabled={
                 proposta.status === ProposalStatus.AGUARDANDO_AUDITORIA ||
@@ -206,10 +206,6 @@ export default function ValidacaoPorIdPage() {
               <CheckCircle2 size={16} aria-hidden="true" />
               Aprovar validação
             </Button>
-            <Button variant="ghost">
-              <FileWarning size={16} aria-hidden="true" />
-              Solicitar novo documento
-            </Button>
             <Button
               variant="secondary"
               onClick={() => setShowRejectModal(true)}
@@ -217,6 +213,10 @@ export default function ValidacaoPorIdPage() {
             >
               <ShieldAlert size={16} aria-hidden="true" />
               Reprovar proposta
+            </Button>
+            <Button variant="ghost">
+              <FileWarning size={16} aria-hidden="true" />
+              Solicitar novo documento
             </Button>
             <Link
               className={styles.actionLinkButton}

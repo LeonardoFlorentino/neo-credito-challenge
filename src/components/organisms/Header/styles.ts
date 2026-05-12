@@ -31,6 +31,39 @@ export const StyledLogo = styled.div`
   }
 `;
 
+export const StyledMenuToggle = styled.button`
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid
+    ${({ theme }) =>
+      theme.mode === "light"
+        ? "rgba(255, 255, 255, 0.55)"
+        : theme.colors.gray300};
+  background: ${({ theme }) =>
+    theme.mode === "light"
+      ? "rgba(255, 255, 255, 0.18)"
+      : "rgba(255, 255, 255, 0.04)"};
+  color: ${({ theme }) =>
+    theme.mode === "light" ? theme.colors.onPrimary : theme.colors.text};
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: ${({ theme }) =>
+      theme.mode === "light" ? "#ffffff" : theme.colors.primary};
+    color: ${({ theme }) =>
+      theme.mode === "light" ? "#ffffff" : theme.colors.primary};
+    background: ${({ theme }) =>
+      theme.mode === "light"
+        ? "rgba(255, 255, 255, 0.24)"
+        : "rgba(111, 109, 255, 0.12)"};
+  }
+`;
+
 export const StyledProfile = styled.div`
   display: flex;
   align-items: center;

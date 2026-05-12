@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 
-type ButtonVariant = "primary" | "secondary" | "ghost";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "success";
 
 export const StyledButton = styled.button<{
   $variant: ButtonVariant;
@@ -50,6 +50,17 @@ export const StyledButton = styled.button<{
       &:hover:not(:disabled) {
         background: ${theme.colors.gray100};
         border-color: ${theme.colors.primary};
+      }
+    `}
+
+  ${({ $variant, theme }) =>
+    $variant === "success" &&
+    css`
+      background: ${theme.colors.success};
+      color: ${theme.colors.onPrimary};
+
+      &:hover:not(:disabled) {
+        opacity: 0.92;
       }
     `}
 

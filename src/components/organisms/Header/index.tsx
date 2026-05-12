@@ -1,24 +1,37 @@
 "use client";
 
-import { MoonStar, SunMedium } from "lucide-react";
+import { Menu, MoonStar, SunMedium } from "lucide-react";
 import { Typography } from "@/components/atoms/Typography";
 import { useThemeMode } from "@/styles/ThemeProvider";
 import {
   StyledHeader,
   StyledLogo,
+  StyledMenuToggle,
   StyledProfile,
   StyledAvatar,
   StyledProfileInfo,
   StyledThemeToggle,
 } from "./styles";
 
-export function Header() {
+type HeaderProps = {
+  onToggleSidebar: () => void;
+};
+
+export function Header({ onToggleSidebar }: HeaderProps) {
   const { mode, toggleMode } = useThemeMode();
   const isLightMode = mode === "light";
 
   return (
     <StyledHeader>
       <StyledLogo>
+        <StyledMenuToggle
+          type="button"
+          onClick={onToggleSidebar}
+          aria-label="Expandir ou retrair menu lateral"
+          title="Expandir ou retrair menu lateral"
+        >
+          <Menu size={18} aria-hidden="true" />
+        </StyledMenuToggle>
         <Typography variant="h2">Neo Crédito</Typography>
       </StyledLogo>
       <StyledProfile>
