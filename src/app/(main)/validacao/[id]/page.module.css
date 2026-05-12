@@ -35,13 +35,14 @@
   border: 1px solid var(--app-border);
   border-radius: 10px;
   padding: 16px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-  align-content: start;
 }
 
 .cardWide {
   grid-column: span 7;
+  align-content: start;
 }
 
 .cardMedium {
@@ -62,6 +63,15 @@
 .field {
   display: grid;
   gap: 1px;
+}
+
+.fieldFull {
+  grid-column: span 2;
+}
+
+.locationBlock {
+  display: grid;
+  gap: 10px;
 }
 
 .label {
@@ -134,14 +144,61 @@
   gap: 8px;
 }
 
+.mediaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: min(760px, 100%);
+  flex: 1;
+  min-height: 0;
+}
+
+.mediaCard {
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: var(--app-surface-soft);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: zoom-in;
+  text-align: center;
+  align-items: center;
+}
+
+.mediaCard:hover {
+  border-color: var(--app-link);
+}
+
+.mediaImage {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+}
+
+.mediaCaption {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  color: var(--app-link);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .modalOverlay {
   position: fixed;
   inset: 0;
   z-index: 90;
   background: var(--app-overlay);
   display: grid;
-  place-items: center;
-  padding: 16px;
+  place-items: start center;
+  overflow-y: auto;
+  padding: 24px 16px;
 }
 
 .modalCard {
@@ -152,6 +209,17 @@
   padding: 16px;
   display: grid;
   gap: 12px;
+}
+
+.zoomModal {
+  width: min(900px, 96vw);
+}
+
+.zoomImage {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface-soft);
 }
 
 .modalActions {
@@ -209,6 +277,14 @@
   }
 
   .subscriberGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .fieldFull {
+    grid-column: span 1;
+  }
+
+  .mediaGrid {
     grid-template-columns: 1fr;
   }
 }

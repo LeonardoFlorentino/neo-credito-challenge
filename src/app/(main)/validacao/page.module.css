@@ -129,6 +129,11 @@
     grid-template-columns: 1fr;
   }
 
+  .summaryCard {
+    text-align: center;
+    justify-items: center;
+  }
+
   .metaGrid {
     grid-template-columns: 1fr;
   }

@@ -1,5 +1,84 @@
 import { ProposalStatus, type Proposal } from "@/types/Proposal";
 
+function normalizeName(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function isLikelyFemaleName(fullName: string) {
+  const firstName = normalizeName(fullName).split(" ")[0] ?? "";
+
+  const knownFemaleNames = new Set([
+    "ana",
+    "beatriz",
+    "camila",
+    "fernanda",
+    "isabel",
+    "isabela",
+    "isabella",
+    "mariana",
+  ]);
+
+  if (knownFemaleNames.has(firstName)) {
+    return true;
+  }
+
+  return firstName.endsWith("a") && firstName !== "joao";
+}
+
+function seedToIndex(seed: string, max: number) {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return (hash % max) + 1;
+}
+
+function getMockSelfieUrl(fullName: string, seed: string) {
+  const gender = isLikelyFemaleName(fullName) ? "women" : "men";
+  const index = seedToIndex(seed, 70);
+  return `https://randomuser.me/api/portraits/${gender}/${index}.jpg`;
+}
+
+function getMockDocumentUrl(fullName: string, seed: string) {
+  const normalized = normalizeName(fullName);
+  const initials = fullName
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+  const isFemale = isLikelyFemaleName(fullName);
+  const accent = isFemale ? "#8f63d9" : "#2d7ccf";
+  const accentSoft = isFemale ? "#ece2ff" : "#e2f0ff";
+  const seedSuffix = normalized.slice(0, 6) || seed.slice(0, 6);
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#eef3fb"/>
+          <stop offset="100%" stop-color="#dde7f6"/>
+        </linearGradient>
+      </defs>
+      <rect width="900" height="560" fill="url(#bg)"/>
+      <rect x="40" y="40" width="820" height="480" rx="18" fill="#ffffff" stroke="#c7d4ea" stroke-width="3"/>
+      <text x="78" y="110" fill="#2f446b" font-size="30" font-family="Arial, sans-serif" font-weight="700">Documento do Assinante</text>
+      <rect x="78" y="140" width="300" height="300" rx="12" fill="#f8fbff" stroke="#d0dcee"/>
+      <circle cx="228" cy="260" r="92" fill="${accentSoft}" stroke="${accent}" stroke-width="8"/>
+      <text x="228" y="278" fill="${accent}" font-size="62" font-family="Arial, sans-serif" text-anchor="middle" font-weight="700">${initials}</text>
+      <text x="420" y="200" fill="#334f77" font-size="22" font-family="Arial, sans-serif">Nome: ${fullName}</text>
+      <text x="420" y="240" fill="#5f7394" font-size="19" font-family="Arial, sans-serif">Perfil inferido: ${isFemale ? "Feminino" : "Masculino"}</text>
+      <text x="420" y="282" fill="#5f7394" font-size="19" font-family="Arial, sans-serif">Documento mockado para validação visual</text>
+      <text x="420" y="324" fill="#5f7394" font-size="19" font-family="Arial, sans-serif">Fonte interna: proposalsMock</text>
+      <text x="420" y="366" fill="#5f7394" font-size="19" font-family="Arial, sans-serif">Seed: ${seedSuffix}</text>
+    </svg>
+  `;
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 export const proposalsMock: Proposal[] = [
   {
     id: "1",
@@ -330,6 +409,15 @@ export const proposalsMock: Proposal[] = [
     },
   },
 ];
+
+for (const proposal of proposalsMock) {
+  const mediaSeed = `${proposal.id}-${proposal.nomeCliente}`;
+  proposal.dossie.selfieUrl = getMockSelfieUrl(proposal.nomeCliente, mediaSeed);
+  proposal.dossie.documentoUrl = getMockDocumentUrl(
+    proposal.nomeCliente,
+    mediaSeed,
+  );
+}
 
 export async function fetchProposalsMock(delayMs = 700): Promise<Proposal[]> {
   await new Promise((resolve) => {

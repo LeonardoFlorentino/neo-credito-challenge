@@ -57,7 +57,7 @@ export function ProposalsTable({ proposals, onRowClick }: ProposalsTableProps) {
                 <Badge variant={proposal.status}>{proposal.status}</Badge>
               </td>
               <td>
-                {new Date(proposal.dataUltimoEvento).toLocaleDateString("pt-BR")}
+                {new Date(proposal.dataUltimoEvento).toLocaleString("pt-BR")}
               </td>
             </tr>
           ))}

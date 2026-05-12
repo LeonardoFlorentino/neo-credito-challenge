@@ -11,6 +11,7 @@ import {
   RotateCcw,
   ShieldAlert,
   XCircle,
+  ZoomIn,
 } from "lucide-react";
 
 import { Badge } from "@/components/atoms/Badge";
@@ -35,6 +36,38 @@ function formatResultado(resultado: "SUCESSO" | "SEM_RESPOSTA" | "FALHA") {
   return "Falha";
 }
 
+type CityReference = {
+  name: string;
+  lat: number;
+  lng: number;
+};
+
+const CITY_REFERENCES: CityReference[] = [
+  { name: "São Paulo - SP", lat: -23.55052, lng: -46.633308 },
+  { name: "Rio de Janeiro - RJ", lat: -22.906847, lng: -43.172896 },
+  { name: "Brasília - DF", lat: -15.793889, lng: -47.882778 },
+  { name: "Belo Horizonte - MG", lat: -19.916681, lng: -43.934493 },
+  { name: "Fortaleza - CE", lat: -3.71722, lng: -38.5434 },
+  { name: "Salvador - BA", lat: -12.971389, lng: -38.501389 },
+  { name: "Recife - PE", lat: -8.054277, lng: -34.881256 },
+  { name: "Porto Alegre - RS", lat: -30.034647, lng: -51.217658 },
+  { name: "Curitiba - PR", lat: -25.428954, lng: -49.267137 },
+];
+
+function getApproximateAddress(lat: number, lng: number) {
+  const nearestCity = CITY_REFERENCES.reduce((closest, candidate) => {
+    const closestDistance = Math.hypot(closest.lat - lat, closest.lng - lng);
+    const candidateDistance = Math.hypot(
+      candidate.lat - lat,
+      candidate.lng - lng,
+    );
+
+    return candidateDistance < closestDistance ? candidate : closest;
+  }, CITY_REFERENCES[0]);
+
+  return `Região aproximada de ${nearestCity.name}`;
+}
+
 export default function ValidacaoPorIdPage() {
   const params = useParams<{ id: string }>();
   const { proposals, isLoading, error, retry, updateProposalStatus } =
@@ -48,6 +81,10 @@ export default function ValidacaoPorIdPage() {
   );
   const [pendingReason, setPendingReason] = useState("");
   const [pendingDetail, setPendingDetail] = useState("");
+  const [zoomImage, setZoomImage] = useState<{
+    src: string;
+    alt: string;
+  } | null>(null);
   const proposta = proposals.find((item) => item.id === id);
 
   useEffect(() => {
@@ -125,6 +162,16 @@ export default function ValidacaoPorIdPage() {
 
   const isRejectFormValid =
     pendingReason.trim().length > 0 && pendingDetail.trim().length > 0;
+  const assinaturaConcluida = proposta.status === ProposalStatus.ASSINADO;
+  const dataAssinatura = assinaturaConcluida
+    ? new Date(proposta.dataUltimoEvento).toLocaleString("pt-BR")
+    : "Assinatura ainda não concluída";
+  const approximateAddress = getApproximateAddress(
+    proposta.dossie.geolocalizacao.lat,
+    proposta.dossie.geolocalizacao.lng,
+  );
+  const selfiePreview = proposta.dossie.selfieUrl;
+  const documentPreview = proposta.dossie.documentoUrl;
 
   return (
     <div className={styles.container}>
@@ -164,11 +211,58 @@ export default function ValidacaoPorIdPage() {
             </div>
 
             <div className={styles.field}>
-              <span className={styles.label}>Data</span>
-              <span className={styles.value}>
-                {new Date(proposta.dataEnvio).toLocaleString("pt-BR")}
-              </span>
+              <span className={styles.label}>Data da assinatura</span>
+              <span className={styles.value}>{dataAssinatura}</span>
             </div>
+
+            <div className={`${styles.field} ${styles.fieldFull}`}>
+              <span className={styles.label}>Endereço aproximado</span>
+              <span className={styles.value}>{approximateAddress}</span>
+            </div>
+          </div>
+
+          <div className={styles.mediaGrid}>
+            <button
+              type="button"
+              className={styles.mediaCard}
+              onClick={() =>
+                setZoomImage({
+                  src: selfiePreview,
+                  alt: "Selfie do assinante",
+                })
+              }
+            >
+              <img
+                className={styles.mediaImage}
+                src={selfiePreview}
+                alt="Selfie do assinante"
+              />
+              <span className={styles.mediaCaption}>
+                <ZoomIn size={14} aria-hidden="true" />
+                Ampliar selfie
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className={styles.mediaCard}
+              onClick={() =>
+                setZoomImage({
+                  src: documentPreview,
+                  alt: "Documento do assinante",
+                })
+              }
+            >
+              <img
+                className={styles.mediaImage}
+                src={documentPreview}
+                alt="Documento do assinante"
+              />
+              <span className={styles.mediaCaption}>
+                <ZoomIn size={14} aria-hidden="true" />
+                Ampliar documento
+              </span>
+            </button>
           </div>
         </article>
 
@@ -177,18 +271,20 @@ export default function ValidacaoPorIdPage() {
 
           <SimilarityScore value={proposta.dossie.similaridade} />
 
-          <div className={styles.field}>
-            <span className={styles.label}>Geolocalização</span>
-            <span className={styles.value}>
-              {proposta.dossie.geolocalizacao.lat},{" "}
-              {proposta.dossie.geolocalizacao.lng}
-            </span>
-          </div>
+          <div className={styles.locationBlock}>
+            <div className={styles.field}>
+              <span className={styles.label}>Geolocalização</span>
+              <span className={styles.value}>
+                {proposta.dossie.geolocalizacao.lat},{" "}
+                {proposta.dossie.geolocalizacao.lng}
+              </span>
+            </div>
 
-          <MiniMap
-            lat={proposta.dossie.geolocalizacao.lat}
-            lng={proposta.dossie.geolocalizacao.lng}
-          />
+            <MiniMap
+              lat={proposta.dossie.geolocalizacao.lat}
+              lng={proposta.dossie.geolocalizacao.lng}
+            />
+          </div>
         </article>
 
         <article className={`${styles.card} ${styles.cardFull}`}>
@@ -358,6 +454,33 @@ export default function ValidacaoPorIdPage() {
       {showSuccessToast && (
         <div className={styles.toast} role="status" aria-live="polite">
           {toastMessage}
+        </div>
+      )}
+
+      {zoomImage && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setZoomImage(null)}
+          role="presentation"
+        >
+          <div
+            className={`${styles.modalCard} ${styles.zoomModal}`}
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={zoomImage.alt}
+          >
+            <img
+              className={styles.zoomImage}
+              src={zoomImage.src}
+              alt={zoomImage.alt}
+            />
+            <div className={styles.modalActions}>
+              <Button variant="ghost" onClick={() => setZoomImage(null)}>
+                Fechar
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
