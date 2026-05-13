@@ -1,5 +1,6 @@
 import { Badge } from "@/components/atoms/Badge";
 import type { Proposal } from "@/types/Proposal";
+import { formatDateTime } from "@/utils/formatDate";
 
 import { TableContainer, Table } from "./styles";
 import {
@@ -55,7 +56,7 @@ export function ProposalsTable({ proposals, onRowClick }: ProposalsTableProps) {
                 <Badge variant={proposal.status}>{proposal.status}</Badge>
               </td>
               <td>
-                {new Date(proposal.dataUltimoEvento).toLocaleString("pt-BR")}
+                {formatDateTime(proposal.dataUltimoEvento)}
               </td>
             </tr>
           ))}

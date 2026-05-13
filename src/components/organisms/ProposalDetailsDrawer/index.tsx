@@ -1,15 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Typography } from "@/components/atoms/Typography";
 import type { ContactAttempt, Proposal } from "@/types/Proposal";
+import { formatDateTime } from "@/utils/formatDate";
 
 import {
   AttemptItem,
   AttemptMeta,
   AttemptOutcome,
   AttemptsList,
+  CertificateCard,
+  CertificateContent,
+  CertificateFooterNote,
+  CertificateOverlay,
+  CertificatePanel,
+  CertificateRow,
   CloseButton,
   DrawerContent,
   DrawerHeader,
@@ -20,7 +27,8 @@ import {
   FieldBlock,
   FieldLabel,
   FieldValue,
-  SignatureLink,
+  SignatureActionButton,
+  ValiditySeal,
 } from "./styles";
 
 type ProposalDetailsDrawerProps = {
@@ -45,11 +53,24 @@ export function ProposalDetailsDrawer({
   isOpen,
   onClose,
 }: ProposalDetailsDrawerProps) {
+  const [isCertificateOpen, setIsCertificateOpen] = useState(false);
+
+  const handleCloseDrawer = () => {
+    setIsCertificateOpen(false);
+    onClose();
+  };
+
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if (isCertificateOpen) {
+          setIsCertificateOpen(false);
+          return;
+        }
+
+        setIsCertificateOpen(false);
         onClose();
       }
     };
@@ -59,11 +80,15 @@ export function ProposalDetailsDrawer({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, isCertificateOpen, onClose]);
 
   return (
     <>
-      <DrawerOverlay $open={isOpen} onClick={onClose} aria-hidden={!isOpen} />
+      <DrawerOverlay
+        $open={isOpen}
+        onClick={handleCloseDrawer}
+        aria-hidden={!isOpen}
+      />
       <DrawerPanel
         $open={isOpen}
         role="dialog"
@@ -77,7 +102,11 @@ export function ProposalDetailsDrawer({
                 <Typography variant="h2">{proposal.numeroProposta}</Typography>
                 <DrawerSubtitle>{proposal.nomeCliente}</DrawerSubtitle>
               </DrawerTitleGroup>
-              <CloseButton type="button" onClick={onClose} aria-label="Fechar painel">
+              <CloseButton
+                type="button"
+                onClick={handleCloseDrawer}
+                aria-label="Fechar painel"
+              >
                 x
               </CloseButton>
             </DrawerHeader>
@@ -85,20 +114,17 @@ export function ProposalDetailsDrawer({
             <DrawerContent>
               <FieldBlock>
                 <FieldLabel>Link de assinatura</FieldLabel>
-                <SignatureLink
-                  href={proposal.assinaturaUrl}
-                  target="_blank"
-                  rel="noreferrer noopener"
+                <SignatureActionButton
+                  type="button"
+                  onClick={() => setIsCertificateOpen(true)}
                 >
                   Abrir assinatura
-                </SignatureLink>
+                </SignatureActionButton>
               </FieldBlock>
 
               <FieldBlock>
                 <FieldLabel>Data de envio</FieldLabel>
-                <FieldValue>
-                  {new Date(proposal.dataEnvio).toLocaleString("pt-BR")}
-                </FieldValue>
+                <FieldValue>{formatDateTime(proposal.dataEnvio)}</FieldValue>
               </FieldBlock>
 
               <FieldBlock>
@@ -108,7 +134,7 @@ export function ProposalDetailsDrawer({
                     <AttemptItem key={attempt.id}>
                       <AttemptMeta>
                         <span>{formatChannel(attempt.channel)}</span>
-                        <span>{new Date(attempt.timestamp).toLocaleString("pt-BR")}</span>
+                        <span>{formatDateTime(attempt.timestamp)}</span>
                       </AttemptMeta>
                       <AttemptOutcome $success={attempt.outcome === "SUCESSO"}>
                         {formatAttemptOutcome(attempt.outcome)}
@@ -121,6 +147,73 @@ export function ProposalDetailsDrawer({
           </>
         )}
       </DrawerPanel>
+
+      {proposal && (
+        <>
+          <CertificateOverlay
+            $open={isCertificateOpen}
+            onClick={() => setIsCertificateOpen(false)}
+            aria-hidden={!isCertificateOpen}
+          />
+          <CertificatePanel
+            $open={isCertificateOpen}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Certificado mock de assinatura"
+          >
+            <DrawerHeader>
+              <DrawerTitleGroup>
+                <Typography variant="h2">Certificado de Assinatura</Typography>
+                <DrawerSubtitle>Mock para validação do fluxo</DrawerSubtitle>
+              </DrawerTitleGroup>
+              <CloseButton
+                type="button"
+                onClick={() => setIsCertificateOpen(false)}
+                aria-label="Fechar certificado mock"
+              >
+                x
+              </CloseButton>
+            </DrawerHeader>
+
+            <CertificateContent>
+              <CertificateCard>
+                <CertificateRow>
+                  <span>Proposta</span>
+                  <span>{proposal.numeroProposta}</span>
+                </CertificateRow>
+                <CertificateRow>
+                  <span>Cliente</span>
+                  <span>{proposal.nomeCliente}</span>
+                </CertificateRow>
+                <CertificateRow>
+                  <span>CPF</span>
+                  <span>{proposal.cpfCliente}</span>
+                </CertificateRow>
+                <CertificateRow>
+                  <span>Data de envio</span>
+                  <span>{formatDateTime(proposal.dataEnvio)}</span>
+                </CertificateRow>
+                <CertificateRow>
+                  <span>Origem mock</span>
+                  <span>{proposal.assinaturaUrl}</span>
+                </CertificateRow>
+              </CertificateCard>
+
+              <ValiditySeal>
+                Válido
+                <br />
+                Neo Crédito
+              </ValiditySeal>
+
+              <CertificateFooterNote>
+                Nota: o destino real da assinatura digital foi mockado para este
+                teste. Este certificado é apenas ilustrativo para validação da
+                experiência de navegação.
+              </CertificateFooterNote>
+            </CertificateContent>
+          </CertificatePanel>
+        </>
+      )}
     </>
   );
 }

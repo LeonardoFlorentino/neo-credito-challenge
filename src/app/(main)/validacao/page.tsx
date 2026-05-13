@@ -11,6 +11,7 @@ import { Button } from "@/components/atoms/Button";
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Typography } from "@/components/atoms/Typography";
 import { useProposals } from "@/hooks/useProposals";
+import { formatDateTime } from "@/utils/formatDate";
 import { ProposalStatus } from "@/types/Proposal";
 
 import styles from "./page.module.css";
@@ -126,7 +127,7 @@ export default function ValidacaoPage() {
                   <div>
                     <dt className={styles.metaLabel}>Data de envio</dt>
                     <dd className={styles.metaValue}>
-                      {new Date(proposal.dataEnvio).toLocaleString("pt-BR")}
+                      {formatDateTime(proposal.dataEnvio)}
                     </dd>
                   </div>
                   <div>

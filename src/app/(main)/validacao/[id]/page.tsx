@@ -24,6 +24,7 @@ import { MiniMap } from "@/components/molecules/MiniMap";
 import { SimilarityScore } from "@/components/molecules/SimilarityScore";
 import { useProposals } from "@/hooks/useProposals";
 import { ProposalStatus } from "@/types/Proposal";
+import { formatDateTime } from "@/utils/formatDate";
 
 import styles from "./page.module.css";
 
@@ -87,9 +88,11 @@ export default function ValidacaoPorIdPage() {
     src: string;
     alt: string;
   } | null>(null);
+  const [showSignatureMock, setShowSignatureMock] = useState(false);
   const approveCancelButtonRef = useRef<HTMLButtonElement>(null);
   const rejectReasonRef = useRef<HTMLSelectElement>(null);
   const zoomCloseButtonRef = useRef<HTMLButtonElement>(null);
+  const signatureCloseButtonRef = useRef<HTMLButtonElement>(null);
   const lastFocusedElementRef = useRef<HTMLElement | null>(null);
   const proposta = proposals.find((item) => item.id === id);
 
@@ -109,7 +112,10 @@ export default function ValidacaoPorIdPage() {
 
   useEffect(() => {
     const isAnyModalOpen =
-      showApproveModal || showRejectModal || zoomImage !== null;
+      showApproveModal ||
+      showRejectModal ||
+      zoomImage !== null ||
+      showSignatureMock;
 
     if (!isAnyModalOpen) {
       return;
@@ -131,11 +137,21 @@ export default function ValidacaoPorIdPage() {
 
       if (zoomImage) {
         zoomCloseButtonRef.current?.focus();
+        return;
+      }
+
+      if (showSignatureMock) {
+        signatureCloseButtonRef.current?.focus();
       }
     }, 0);
 
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") {
+        return;
+      }
+
+      if (showSignatureMock) {
+        setShowSignatureMock(false);
         return;
       }
 
@@ -162,7 +178,7 @@ export default function ValidacaoPorIdPage() {
       document.body.style.overflow = "";
       lastFocusedElementRef.current?.focus();
     };
-  }, [showApproveModal, showRejectModal, zoomImage]);
+  }, [showApproveModal, showRejectModal, showSignatureMock, zoomImage]);
 
   if (isLoading) {
     return (
@@ -227,7 +243,7 @@ export default function ValidacaoPorIdPage() {
     pendingReason.trim().length > 0 && pendingDetail.trim().length > 0;
   const assinaturaConcluida = proposta.status === ProposalStatus.ASSINADO;
   const dataAssinatura = assinaturaConcluida
-    ? new Date(proposta.dataUltimoEvento).toLocaleString("pt-BR")
+    ? formatDateTime(proposta.dataUltimoEvento)
     : "Assinatura ainda não concluída";
   const approximateAddress = getApproximateAddress(
     proposta.dossie.geolocalizacao.lat,
@@ -262,7 +278,9 @@ export default function ValidacaoPorIdPage() {
 
       <section className={styles.grid}>
         {/* Coluna 1 — Selfie */}
-        <article className={`${styles.card} ${styles.cardThird} ${styles.cardSelfie}`}>
+        <article
+          className={`${styles.card} ${styles.cardThird} ${styles.cardSelfie}`}
+        >
           <button
             type="button"
             className={styles.selfieButton}
@@ -386,7 +404,10 @@ export default function ValidacaoPorIdPage() {
             <Button
               variant="secondary"
               onClick={() => setShowRejectModal(true)}
-              disabled={!canReviewProposal || proposta.status === ProposalStatus.RECUSADO}
+              disabled={
+                !canReviewProposal ||
+                proposta.status === ProposalStatus.RECUSADO
+              }
             >
               <ShieldAlert size={16} aria-hidden="true" />
               Reprovar proposta
@@ -395,15 +416,14 @@ export default function ValidacaoPorIdPage() {
               <FileWarning size={16} aria-hidden="true" />
               Solicitar novo documento
             </Button>
-            <Link
+            <button
+              type="button"
               className={styles.actionLinkButton}
-              href={proposta.assinaturaUrl}
-              target="_blank"
-              rel="noreferrer noopener"
+              onClick={() => setShowSignatureMock(true)}
             >
               <ExternalLink size={16} aria-hidden="true" />
               Abrir assinatura digital
-            </Link>
+            </button>
           </div>
 
           {!canReviewProposal && (
@@ -420,7 +440,7 @@ export default function ValidacaoPorIdPage() {
               <li key={tentativa.id} className={styles.listItem}>
                 <span className={styles.value}>
                   {formatCanal(tentativa.channel)} em{" "}
-                  {new Date(tentativa.timestamp).toLocaleString("pt-BR")}
+                  {formatDateTime(tentativa.timestamp)}
                 </span>
                 <span
                   className={
@@ -544,6 +564,75 @@ export default function ValidacaoPorIdPage() {
       {showSuccessToast && (
         <div className={styles.toast} role="status" aria-live="polite">
           {toastMessage}
+        </div>
+      )}
+
+      {showSignatureMock && (
+        <div
+          className={styles.signatureOverlay}
+          onClick={() => setShowSignatureMock(false)}
+          role="presentation"
+        >
+          <aside
+            className={styles.signaturePanel}
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Certificado mock de assinatura"
+          >
+            <header className={styles.signatureHeader}>
+              <div className={styles.signatureTitleWrap}>
+                <Typography variant="h2">Certificado de Assinatura</Typography>
+                <Typography variant="caption">
+                  Mock para validação do fluxo
+                </Typography>
+              </div>
+              <Button
+                variant="ghost"
+                ref={signatureCloseButtonRef}
+                onClick={() => setShowSignatureMock(false)}
+              >
+                Fechar
+              </Button>
+            </header>
+
+            <div className={styles.signatureContent}>
+              <section className={styles.signatureCard}>
+                <div className={styles.signatureRow}>
+                  <span>Proposta</span>
+                  <span>{proposta.numeroProposta}</span>
+                </div>
+                <div className={styles.signatureRow}>
+                  <span>Cliente</span>
+                  <span>{proposta.nomeCliente}</span>
+                </div>
+                <div className={styles.signatureRow}>
+                  <span>CPF</span>
+                  <span>{proposta.cpfCliente}</span>
+                </div>
+                <div className={styles.signatureRow}>
+                  <span>Data de envio</span>
+                  <span>{formatDateTime(proposta.dataEnvio)}</span>
+                </div>
+                <div className={styles.signatureRow}>
+                  <span>Origem mock</span>
+                  <span>{proposta.assinaturaUrl}</span>
+                </div>
+              </section>
+
+              <div className={styles.signatureSeal}>
+                Válido
+                <br />
+                Neo Crédito
+              </div>
+
+              <Typography variant="caption" className={styles.signatureNote}>
+                Nota: o destino real da assinatura digital foi mockado para este
+                teste. Este certificado é apenas ilustrativo para validação da
+                experiência de navegação.
+              </Typography>
+            </div>
+          </aside>
         </div>
       )}
 

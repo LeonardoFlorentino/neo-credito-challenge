@@ -193,6 +193,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   border-radius: 8px;
   padding: 10px 16px;
   min-height: 40px;
@@ -202,6 +203,7 @@
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .actionLinkButton:hover {
@@ -291,7 +293,7 @@
   z-index: 90;
   background: var(--app-overlay);
   display: grid;
-  place-items: start center;
+  place-items: center;
   overflow-y: auto;
   padding: 24px 16px;
 }
@@ -355,6 +357,100 @@
   font-size: 13px;
   font-weight: 600;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
+.signatureOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  background: var(--app-overlay);
+}
+
+.signaturePanel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(430px, 92vw);
+  height: 100vh;
+  z-index: 96;
+  background: var(--app-surface);
+  border-left: 1px solid var(--app-border);
+  box-shadow: -10px 0 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.signatureHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.signatureTitleWrap {
+  display: grid;
+  gap: 4px;
+}
+
+.signatureContent {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.signatureCard {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 14px;
+  background: var(--app-surface-soft);
+}
+
+.signatureRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.signatureRow span:first-child {
+  color: var(--app-text-soft);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.signatureRow span:last-child {
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+
+.signatureSeal {
+  width: 112px;
+  height: 112px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 4px solid var(--app-success);
+  background: color-mix(in srgb, var(--app-success) 12%, transparent);
+  color: var(--app-success);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.signatureNote {
+  color: var(--app-text-soft);
+  line-height: 1.5;
 }
 
 @media (max-width: 900px) {

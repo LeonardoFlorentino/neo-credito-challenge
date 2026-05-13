@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -27,15 +28,19 @@ type AppThemeProviderProps = {
 };
 
 export function AppThemeProvider({ children }: AppThemeProviderProps) {
-  const [mode, setMode] = useState<ThemeMode>(() => {
-    if (typeof window === "undefined") {
-      return "light";
-    }
+  // Keep initial render deterministic for SSR hydration.
+  const [mode, setMode] = useState<ThemeMode>("light");
 
-    const storedMode = window.localStorage.getItem(STORAGE_KEY);
+  useEffect(() => {
+    const timerId = window.setTimeout(() => {
+      const storedMode = window.localStorage.getItem(STORAGE_KEY);
+      setMode(storedMode === "dark" ? "dark" : "light");
+    }, 0);
 
-    return storedMode === "dark" ? "dark" : "light";
-  });
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, []);
 
   const toggleMode = useCallback(() => {
     setMode((previousMode) => {

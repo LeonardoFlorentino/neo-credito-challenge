@@ -11,6 +11,7 @@ import { ProposalDetailsDrawer } from "@/components/organisms/ProposalDetailsDra
 import { ProposalsTable } from "@/components/organisms/ProposalsTable";
 import { useProposals } from "@/hooks/useProposals";
 import { Proposal, ProposalStatus } from "@/types/Proposal";
+import { formatTime } from "@/utils/formatDate";
 
 export default function PainelPage() {
   const { proposals, isLoading, error, retry, refresh, lastUpdatedAt } =
@@ -95,7 +96,7 @@ export default function PainelPage() {
         <Typography variant="caption">
           Atualização automática a cada 15s
           {lastUpdatedAt
-            ? ` • Última atualização: ${lastUpdatedAt.toLocaleTimeString("pt-BR")}`
+            ? ` • Última atualização: ${formatTime(lastUpdatedAt)}`
             : ""}
         </Typography>
         <Button variant="ghost" onClick={() => void refresh()}>

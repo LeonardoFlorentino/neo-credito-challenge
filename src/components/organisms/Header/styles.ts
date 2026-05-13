@@ -4,7 +4,7 @@ export const StyledHeader = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: 16px 24px 16px 16px;
   background: ${({ theme }) =>
     theme.mode === "light"
       ? "linear-gradient(90deg, #8188dc 0%, #98a0e9 100%)"
