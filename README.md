@@ -33,43 +33,9 @@ Este repositório foi construído como desafio técnico, com foco em:
 - testabilidade e confiabilidade dos fluxos principais;
 - legibilidade e evolução contínua do código.
 
-## Decisões Técnicas
+## Modelo UML do Problema: Máquina de Estados da Proposta
 
-### Atomic Design
-
-O projeto organiza componentes por níveis de composição para facilitar reuso e manutenção:
-
-- atoms: blocos básicos visuais e de interação;
-- molecules: combinações pequenas e reutilizáveis;
-- organisms: seções maiores da interface, com regra de apresentação.
-
-Benefícios práticos:
-
-- reduz duplicação de UI;
-- deixa clara a responsabilidade de cada camada;
-- melhora a previsibilidade dos testes por nível de componente.
-
-### Styled Components
-
-Styled Components foi adotado para co-localizar estilo e componente, mantendo encapsulamento visual e tema centralizado.
-
-Benefícios práticos:
-
-- estilos com escopo local;
-- composição dinâmica de estilos via props;
-- manutenção mais simples de tokens e consistência visual.
-
-### MSW (Mock Service Worker)
-
-MSW foi escolhido para simular API de forma realista, tanto no desenvolvimento quanto nos testes.
-
-Benefícios práticos:
-
-- desacoplamento entre frontend e backend real;
-- testes de integração mais próximos do comportamento de rede;
-- controle claro de cenários de sucesso, loading, erro e retry.
-
-## Diagrama de Máquina de Estados (Status da Proposta)
+Este diagrama UML (state machine) representa o problema central que o projeto buscou resolver: a evolução controlada dos status da proposta ao longo da operação, da validação até a assinatura eletrônica.
 
 ```mermaid
 stateDiagram-v2
@@ -86,6 +52,30 @@ stateDiagram-v2
 		Expirada --> [*]
 		Concluida --> [*]
 ```
+
+## Decisões Técnicas
+
+Esta seção resume, em ordem cronológica, o que foi construído, por que cada escolha foi feita e como foi implementada tecnicamente.
+
+### 1) Fundação da aplicação
+
+Primeiro, construí uma base técnica estável para reduzir retrabalho nas etapas seguintes. A aplicação foi estruturada com Next.js + TypeScript e organização modular em `src`, enquanto o design system inicial foi montado com Styled Components (tema, estilos globais e componentes base). Em paralelo, modelei os tipos de domínio da proposta e usei MSW para simular a API desde o início. O objetivo técnico aqui foi garantir consistência entre contrato de dados, interface e regras de negócio antes de escalar funcionalidades.
+
+### 2) Entrega do fluxo principal de operação
+
+Com a base pronta, implementei o caminho principal de uso: layout operacional, listagem de propostas, filtros por busca/status e ordenação por recência. A separação entre apresentação e lógica foi feita com componentes reutilizáveis e hook dedicado (`useProposals`), permitindo controlar loading, erro, retry, refresh manual e atualização automática. Essa abordagem foi escolhida para manter a experiência rápida para o operador e, ao mesmo tempo, deixar o código preparado para evoluir sem acoplamento excessivo.
+
+### 3) Profundidade de análise e contexto decisório
+
+Na etapa seguinte, foquei em enriquecer a decisão operacional dentro da tela de validação: drawer de detalhes, visualização de dossiê, dados de contexto (CPF, IP, geolocalização aproximada), evidências com zoom e ações de aprovação/reprovação. Também implementei a solicitação de novo documento com validação de formulário, mudança de status e persistência no estado mockado. O motivo técnico foi tornar o frontend aderente ao fluxo real da operação, em que a decisão depende de contexto completo e rastreável, não apenas de uma listagem simples.
+
+### 4) Confiabilidade por testes e previsibilidade de comportamento
+
+Depois de consolidar as funcionalidades, priorizei estabilidade. Foram adicionados testes unitários e de integração com Jest + Testing Library cobrindo filtros, estados de loading/erro, regras de habilitação por status e fluxos críticos da validação detalhada (aprovar, reprovar e solicitar documento). Essa camada de testes foi essencial para proteger comportamento de ponta a ponta e permitir melhorias contínuas com menor risco de regressão.
+
+### 5) Acabamento operacional, acessibilidade e performance percebida
+
+Na fase final, refinei aspectos que impactam uso diário: skeletons e tela de carregamento, responsividade do layout, acessibilidade de modais (controle de foco, fechamento por Escape e retorno de foco) e uso de `next/image` nas mídias da validação. Também mantive feedback claro ao usuário com toasts e mensagens de erro/retry. Tecnicamente, essas escolhas foram feitas para melhorar fluidez operacional, reduzir atrito de navegação e elevar a qualidade percebida sem comprometer a simplicidade da arquitetura.
 
 ## Instalação e Execução
 
@@ -137,13 +127,10 @@ npm start
 
 ## O que faria com mais tempo
 
-- **Testes de integração para US-02** — a tela `/validacao/[id]` não possui testes automatizados. Cobriria os fluxos de aprovação, reprovação, validação do formulário de pendência e feedback de toast.
-- **`next/image` no lugar de `<img>`** — substituiria as três ocorrências de `<img>` para aproveitar otimização de LCP, lazy loading automático e redução de largura de banda.
-- **Paginação ou scroll infinito** — a listagem de propostas carrega tudo de uma vez; em produção com volumes reais seria necessário paginar.
-- **Filtro pré-aplicado em Validação Operacional** — a rota `/validacao` exibiria por padrão apenas propostas com status `ASSINADO`, pois são as únicas acionáveis pelo Operador naquele módulo.
-- **Tratamento de sessão / autenticação** — simular papéis de usuário (CORBAN vs. Operador) com redirecionamento por perfil, alinhando o sistema ao fluxo de três atores descrito no desafio.
-- **Cache e revalidação** — usar `stale-while-revalidate` ou React Query para manter a listagem sincronizada sem polling manual.
-- **Acessibilidade aprimorada** — adicionar `aria-live` nos toasts e garantir foco gerenciado nos modais para usuários de teclado e leitores de tela.
+- **Motor antifraude documental e comportamental** — integrar validação de documentos com sinais de risco transacional para reduzir fraude sem degradar conversão.
+- **Trilha de auditoria com valor jurídico** — registrar cadeia de evidências da assinatura (eventos, origem, integridade e temporalidade) para suportar auditoria e contestação.
+- **Orquestração operacional multicanal para CORBAN** — implementar priorização por SLA, alçadas e distribuição inteligente para ganho de escala e governança.
+- **Camada de compliance e privacidade by design** — aplicar políticas de consentimento, retenção e acesso a dados sensíveis alinhadas a requisitos regulatórios.
 
 ## Escopo
 
