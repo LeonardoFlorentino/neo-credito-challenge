@@ -230,6 +230,30 @@
   flex-wrap: wrap;
 }
 
+.logContent {
+  display: grid;
+  gap: 4px;
+  min-width: min(360px, 100%);
+  flex: 1;
+}
+
+.logDescription {
+  color: var(--app-text-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.logMeta {
+  color: var(--app-text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.requestBadge {
+  color: var(--app-link);
+  font-weight: 700;
+}
+
 .outcomeOk {
   color: var(--app-success);
   font-weight: 600;

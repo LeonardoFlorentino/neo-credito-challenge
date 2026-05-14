@@ -42,6 +42,7 @@ function createProposal(overrides: Partial<Proposal>): Proposal {
         outcome: "SEM_RESPOSTA",
       },
     ],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.local/selfie.jpg",
       documentoUrl: "https://cdn.local/documento.pdf",
@@ -73,13 +74,16 @@ describe("ValidacaoPorIdPage US-02 integration", () => {
       error: null,
       retry: jest.fn(),
       updateProposalStatus,
+      requestNewDocument: jest.fn(),
     });
 
     renderWithTheme(<ValidacaoPorIdPage />);
 
     await user.click(screen.getByRole("button", { name: "Aprovar validação" }));
 
-    expect(screen.getByRole("heading", { name: "Confirmar aprovação" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Confirmar aprovação" }),
+    ).toBeInTheDocument();
 
     const confirmButton = screen.getByRole("button", { name: "Confirmar" });
     await user.click(confirmButton);
@@ -106,13 +110,16 @@ describe("ValidacaoPorIdPage US-02 integration", () => {
       error: null,
       retry: jest.fn(),
       updateProposalStatus,
+      requestNewDocument: jest.fn(),
     });
 
     renderWithTheme(<ValidacaoPorIdPage />);
 
     await user.click(screen.getByRole("button", { name: "Reprovar proposta" }));
 
-    expect(screen.getByRole("heading", { name: "Informar Pendência" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Informar Pendência" }),
+    ).toBeInTheDocument();
 
     const confirmRejectButton = screen.getByRole("button", {
       name: "Confirmar reprovação",
@@ -132,9 +139,72 @@ describe("ValidacaoPorIdPage US-02 integration", () => {
 
     await user.click(confirmRejectButton);
 
-    expect(updateProposalStatus).toHaveBeenCalledWith("1", ProposalStatus.RECUSADO);
-    expect(screen.getByText("Proposta atualizada para RECUSADO.")).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Informar Pendência" })).not.toBeInTheDocument();
+    expect(updateProposalStatus).toHaveBeenCalledWith(
+      "1",
+      ProposalStatus.RECUSADO,
+    );
+    expect(
+      screen.getByText("Proposta atualizada para RECUSADO."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Informar Pendência" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("opens request-document modal, validates required fields, and confirms the request", async () => {
+    const user = userEvent.setup();
+    const requestNewDocument = jest.fn().mockReturnValue(true);
+
+    useProposals.mockReturnValue({
+      proposals: [createProposal({ status: ProposalStatus.ASSINADO })],
+      isLoading: false,
+      error: null,
+      retry: jest.fn(),
+      updateProposalStatus: jest.fn(),
+      requestNewDocument,
+    });
+
+    renderWithTheme(<ValidacaoPorIdPage />);
+
+    await user.click(
+      screen.getByRole("button", { name: "Solicitar novo documento" }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Solicitar novo documento" }),
+    ).toBeInTheDocument();
+
+    const confirmRequestButton = screen.getByRole("button", {
+      name: "Confirmar solicitação",
+    });
+    expect(confirmRequestButton).toBeDisabled();
+
+    await user.selectOptions(
+      screen.getByRole("combobox"),
+      "SELFIE_COM_DOCUMENTO",
+    );
+    await user.type(
+      screen.getByPlaceholderText(
+        "Explique o ajuste necessário para o reenvio",
+      ),
+      "Enviar nova selfie segurando o documento original, com bordas visíveis.",
+    );
+
+    expect(confirmRequestButton).toBeEnabled();
+
+    await user.click(confirmRequestButton);
+
+    expect(requestNewDocument).toHaveBeenCalledWith("1", {
+      documentType: "SELFIE_COM_DOCUMENTO",
+      instructions:
+        "Enviar nova selfie segurando o documento original, com bordas visíveis.",
+    });
+    expect(
+      screen.getByText("Proposta atualizada para AGUARDANDO DOCUMENTOS."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Solicitar novo documento" }),
+    ).not.toBeInTheDocument();
   });
 
   it("keeps approval and rejection disabled when proposal is not signed", () => {
@@ -144,6 +214,7 @@ describe("ValidacaoPorIdPage US-02 integration", () => {
       error: null,
       retry: jest.fn(),
       updateProposalStatus: jest.fn(),
+      requestNewDocument: jest.fn(),
     });
 
     renderWithTheme(<ValidacaoPorIdPage />);
@@ -168,12 +239,15 @@ describe("ValidacaoPorIdPage US-02 integration", () => {
       error: null,
       retry: jest.fn(),
       updateProposalStatus: jest.fn(),
+      requestNewDocument: jest.fn(),
     });
 
     const { container } = renderWithTheme(<ValidacaoPorIdPage />);
 
     expect(screen.queryByText("Validação da Proposta")).not.toBeInTheDocument();
-    expect(container.querySelectorAll('span[aria-hidden="true"]').length).toBeGreaterThan(0);
+    expect(
+      container.querySelectorAll('span[aria-hidden="true"]').length,
+    ).toBeGreaterThan(0);
   });
 
   it("renders error state and allows retry", async () => {
@@ -186,11 +260,14 @@ describe("ValidacaoPorIdPage US-02 integration", () => {
       error: "Não foi possível carregar as propostas.",
       retry,
       updateProposalStatus: jest.fn(),
+      requestNewDocument: jest.fn(),
     });
 
     renderWithTheme(<ValidacaoPorIdPage />);
 
-    expect(screen.getByText("Não foi possível carregar as propostas.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Não foi possível carregar as propostas."),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
 

@@ -23,7 +23,7 @@ import { Typography } from "@/components/atoms/Typography";
 import { MiniMap } from "@/components/molecules/MiniMap";
 import { SimilarityScore } from "@/components/molecules/SimilarityScore";
 import { useProposals } from "@/hooks/useProposals";
-import { ProposalStatus } from "@/types/Proposal";
+import { ProposalStatus, type RequestedDocumentType } from "@/types/Proposal";
 import { formatDateTime } from "@/utils/formatDate";
 
 import styles from "./page.module.css";
@@ -73,17 +73,29 @@ function getApproximateAddress(lat: number, lng: number) {
 
 export default function ValidacaoPorIdPage() {
   const params = useParams<{ id: string }>();
-  const { proposals, isLoading, error, retry, updateProposalStatus } =
-    useProposals();
+  const {
+    proposals,
+    isLoading,
+    error,
+    retry,
+    updateProposalStatus,
+    requestNewDocument,
+  } = useProposals();
   const id = typeof params?.id === "string" ? params.id : "";
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showRequestDocumentModal, setShowRequestDocumentModal] =
+    useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [toastMessage, setToastMessage] = useState(
     "Proposta atualizada para AGUARDANDO AUDITORIA.",
   );
   const [pendingReason, setPendingReason] = useState("");
   const [pendingDetail, setPendingDetail] = useState("");
+  const [requestedDocumentType, setRequestedDocumentType] = useState<
+    RequestedDocumentType | ""
+  >("");
+  const [requestDocumentReason, setRequestDocumentReason] = useState("");
   const [zoomImage, setZoomImage] = useState<{
     src: string;
     alt: string;
@@ -91,6 +103,7 @@ export default function ValidacaoPorIdPage() {
   const [showSignatureMock, setShowSignatureMock] = useState(false);
   const approveCancelButtonRef = useRef<HTMLButtonElement>(null);
   const rejectReasonRef = useRef<HTMLSelectElement>(null);
+  const requestDocumentTypeRef = useRef<HTMLSelectElement>(null);
   const zoomCloseButtonRef = useRef<HTMLButtonElement>(null);
   const signatureCloseButtonRef = useRef<HTMLButtonElement>(null);
   const lastFocusedElementRef = useRef<HTMLElement | null>(null);
@@ -114,6 +127,7 @@ export default function ValidacaoPorIdPage() {
     const isAnyModalOpen =
       showApproveModal ||
       showRejectModal ||
+      showRequestDocumentModal ||
       zoomImage !== null ||
       showSignatureMock;
 
@@ -135,6 +149,11 @@ export default function ValidacaoPorIdPage() {
         return;
       }
 
+      if (showRequestDocumentModal) {
+        requestDocumentTypeRef.current?.focus();
+        return;
+      }
+
       if (zoomImage) {
         zoomCloseButtonRef.current?.focus();
         return;
@@ -152,6 +171,11 @@ export default function ValidacaoPorIdPage() {
 
       if (showSignatureMock) {
         setShowSignatureMock(false);
+        return;
+      }
+
+      if (showRequestDocumentModal) {
+        setShowRequestDocumentModal(false);
         return;
       }
 
@@ -178,7 +202,13 @@ export default function ValidacaoPorIdPage() {
       document.body.style.overflow = "";
       lastFocusedElementRef.current?.focus();
     };
-  }, [showApproveModal, showRejectModal, showSignatureMock, zoomImage]);
+  }, [
+    showApproveModal,
+    showRejectModal,
+    showRequestDocumentModal,
+    showSignatureMock,
+    zoomImage,
+  ]);
 
   if (isLoading) {
     return (
@@ -239,8 +269,32 @@ export default function ValidacaoPorIdPage() {
     setShowSuccessToast(true);
   };
 
+  const handleConfirmRequestDocument = () => {
+    if (!requestedDocumentType) {
+      return;
+    }
+
+    const hasUpdated = requestNewDocument(proposta.id, {
+      documentType: requestedDocumentType,
+      instructions: requestDocumentReason.trim(),
+    });
+
+    if (!hasUpdated) {
+      return;
+    }
+
+    setShowRequestDocumentModal(false);
+    setRequestedDocumentType("");
+    setRequestDocumentReason("");
+    setToastMessage("Proposta atualizada para AGUARDANDO DOCUMENTOS.");
+    setShowSuccessToast(true);
+  };
+
   const isRejectFormValid =
     pendingReason.trim().length > 0 && pendingDetail.trim().length > 0;
+  const isRequestDocumentFormValid =
+    requestedDocumentType.trim().length > 0 &&
+    requestDocumentReason.trim().length > 0;
   const assinaturaConcluida = proposta.status === ProposalStatus.ASSINADO;
   const dataAssinatura = assinaturaConcluida
     ? formatDateTime(proposta.dataUltimoEvento)
@@ -363,7 +417,6 @@ export default function ValidacaoPorIdPage() {
           </button>
         </article>
 
-        {/* Coluna 3 — Análise de Identidade */}
         <article className={`${styles.card} ${styles.cardThird}`}>
           <Typography variant="h2">Análise de Identidade</Typography>
 
@@ -412,7 +465,11 @@ export default function ValidacaoPorIdPage() {
               <ShieldAlert size={16} aria-hidden="true" />
               Reprovar proposta
             </Button>
-            <Button variant="ghost">
+            <Button
+              variant="ghost"
+              onClick={() => setShowRequestDocumentModal(true)}
+              disabled={!canReviewProposal}
+            >
               <FileWarning size={16} aria-hidden="true" />
               Solicitar novo documento
             </Button>
@@ -454,6 +511,33 @@ export default function ValidacaoPorIdPage() {
               </li>
             ))}
           </ul>
+
+          {proposta.documentRequests.length > 0 && (
+            <>
+              <Typography variant="body">Solicitações de documento</Typography>
+
+              <ul className={styles.list}>
+                {proposta.documentRequests.map((request) => (
+                  <li key={request.id} className={styles.listItem}>
+                    <div className={styles.logContent}>
+                      <span className={styles.value}>
+                        {request.documentLabel}
+                      </span>
+                      <span className={styles.logDescription}>
+                        {request.instructions}
+                      </span>
+                      <span className={styles.logMeta}>
+                        Operação em {formatDateTime(request.requestedAt)}
+                      </span>
+                    </div>
+                    <span className={styles.requestBadge}>
+                      Reenvio solicitado
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </article>
       </section>
 
@@ -555,6 +639,83 @@ export default function ValidacaoPorIdPage() {
               >
                 <XCircle size={16} aria-hidden="true" />
                 Confirmar reprovação
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRequestDocumentModal && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowRequestDocumentModal(false)}
+          role="presentation"
+        >
+          <div
+            className={styles.modalCard}
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="request-document-dialog-title"
+          >
+            <Typography variant="h2" id="request-document-dialog-title">
+              Solicitar novo documento
+            </Typography>
+            <Typography variant="body">
+              Informe qual documento deve ser reenviado e descreva a orientação
+              para o CORBAN ou cliente.
+            </Typography>
+
+            <label className={styles.modalField}>
+              <span className={styles.label}>Documento solicitado</span>
+              <select
+                ref={requestDocumentTypeRef}
+                className={styles.modalInput}
+                value={requestedDocumentType}
+                onChange={(event) =>
+                  setRequestedDocumentType(
+                    event.target.value as RequestedDocumentType | "",
+                  )
+                }
+              >
+                <option value="">Selecione um documento</option>
+                <option value="RG_FRENTE_VERSO">RG frente e verso</option>
+                <option value="CNH_ABERTA">CNH aberta</option>
+                <option value="COMPROVANTE_RESIDENCIA">
+                  Comprovante de residência
+                </option>
+                <option value="SELFIE_COM_DOCUMENTO">
+                  Selfie com documento
+                </option>
+              </select>
+            </label>
+
+            <label className={styles.modalField}>
+              <span className={styles.label}>Orientação</span>
+              <textarea
+                className={styles.modalTextarea}
+                value={requestDocumentReason}
+                onChange={(event) =>
+                  setRequestDocumentReason(event.target.value)
+                }
+                rows={4}
+                placeholder="Explique o ajuste necessário para o reenvio"
+              />
+            </label>
+
+            <div className={styles.modalActions}>
+              <Button
+                variant="ghost"
+                onClick={() => setShowRequestDocumentModal(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleConfirmRequestDocument}
+                disabled={!isRequestDocumentFormValid}
+              >
+                Confirmar solicitação
               </Button>
             </div>
           </div>

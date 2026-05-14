@@ -25,6 +25,7 @@ function createProposal(overrides: Partial<Proposal>): Proposal {
     assinaturaUrl: "https://assinatura.neo-credito.local/NC-2026-0001",
     dataEnvio: "2026-05-10T13:20:00.000Z",
     tentativasContato: [],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.local/selfie.jpg",
       documentoUrl: "https://cdn.local/documento.pdf",
@@ -121,7 +122,9 @@ describe("PainelPage integration", () => {
     const { container } = renderWithTheme(<PainelPage />);
 
     expect(screen.queryByText("Painel CORBAN")).not.toBeInTheDocument();
-    expect(container.querySelectorAll('span[aria-hidden="true"]').length).toBeGreaterThan(0);
+    expect(
+      container.querySelectorAll('span[aria-hidden="true"]').length,
+    ).toBeGreaterThan(0);
   });
 
   it("renders error state and retries loading when user clicks retry", async () => {
@@ -142,10 +145,58 @@ describe("PainelPage integration", () => {
 
     renderWithTheme(<PainelPage />);
 
-    expect(screen.getByText("Não foi possível carregar as propostas.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Não foi possível carregar as propostas."),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
 
     expect(retry).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows requested-document history in the proposal drawer", async () => {
+    const user = userEvent.setup({
+      advanceTimers: (delay) => jest.advanceTimersByTime(delay),
+    });
+
+    useProposals.mockReturnValue({
+      proposals: [
+        createProposal({
+          id: "5",
+          numeroProposta: "NC-2026-0005",
+          nomeCliente: "Rafael Mendonça",
+          status: ProposalStatus.AGUARDANDO_DOCUMENTOS,
+          documentRequests: [
+            {
+              id: "5-r1",
+              documentType: "COMPROVANTE_RESIDENCIA",
+              documentLabel: "Comprovante de residência",
+              instructions:
+                "Reenviar comprovante emitido nos últimos 90 dias, com endereço completo e sem cortes na imagem.",
+              requestedAt: "2026-05-11T09:05:00.000Z",
+              requestedBy: "OPERACAO",
+            },
+          ],
+        }),
+      ],
+      isLoading: false,
+      error: null,
+      lastUpdatedAt: new Date("2026-05-11T12:00:00.000Z"),
+      refresh: jest.fn(),
+      retry: jest.fn(),
+      updateProposalStatus: jest.fn(),
+    });
+
+    renderWithTheme(<PainelPage />);
+
+    await user.click(screen.getByRole("button", { name: /NC-2026-0005/i }));
+
+    expect(screen.getByText("Solicitações de documento")).toBeInTheDocument();
+    expect(screen.getByText("Comprovante de residência")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Reenviar comprovante emitido nos últimos 90 dias, com endereço completo e sem cortes na imagem.",
+      ),
+    ).toBeInTheDocument();
   });
 });

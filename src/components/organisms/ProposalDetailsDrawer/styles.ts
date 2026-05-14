@@ -245,6 +245,13 @@ export const AttemptMeta = styled.div`
   font-size: 13px;
 `;
 
+export const AttemptNote = styled.p`
+  margin: ${({ theme }) => theme.spacing.xs} 0 0;
+  color: ${({ theme }) => theme.colors.gray600};
+  font-size: 13px;
+  line-height: 1.5;
+`;
+
 export const AttemptOutcome = styled.span<{ $success: boolean }>`
   font-weight: 600;
   color: ${({ theme, $success }) =>

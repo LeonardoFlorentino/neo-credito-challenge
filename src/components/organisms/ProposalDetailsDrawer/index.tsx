@@ -3,11 +3,16 @@
 import { useEffect, useState } from "react";
 
 import { Typography } from "@/components/atoms/Typography";
-import type { ContactAttempt, Proposal } from "@/types/Proposal";
+import type {
+  ContactAttempt,
+  DocumentRequest,
+  Proposal,
+} from "@/types/Proposal";
 import { formatDateTime } from "@/utils/formatDate";
 
 import {
   AttemptItem,
+  AttemptNote,
   AttemptMeta,
   AttemptOutcome,
   AttemptsList,
@@ -46,6 +51,11 @@ function formatAttemptOutcome(outcome: ContactAttempt["outcome"]) {
 function formatChannel(channel: ContactAttempt["channel"]) {
   if (channel === "LIGACAO") return "Ligação";
   return channel;
+}
+
+function formatRequestedBy(requestedBy: DocumentRequest["requestedBy"]) {
+  if (requestedBy === "OPERACAO") return "Operação";
+  return requestedBy;
 }
 
 export function ProposalDetailsDrawer({
@@ -143,6 +153,27 @@ export function ProposalDetailsDrawer({
                   ))}
                 </AttemptsList>
               </FieldBlock>
+
+              {proposal.documentRequests.length > 0 && (
+                <FieldBlock>
+                  <FieldLabel>Solicitações de documento</FieldLabel>
+                  <AttemptsList>
+                    {proposal.documentRequests.map((request) => (
+                      <AttemptItem key={request.id}>
+                        <AttemptMeta>
+                          <span>{request.documentLabel}</span>
+                          <span>{formatDateTime(request.requestedAt)}</span>
+                        </AttemptMeta>
+                        <AttemptNote>{request.instructions}</AttemptNote>
+                        <AttemptOutcome $success={false}>
+                          Reenvio solicitado por{" "}
+                          {formatRequestedBy(request.requestedBy)}
+                        </AttemptOutcome>
+                      </AttemptItem>
+                    ))}
+                  </AttemptsList>
+                </FieldBlock>
+              )}
             </DrawerContent>
           </>
         )}

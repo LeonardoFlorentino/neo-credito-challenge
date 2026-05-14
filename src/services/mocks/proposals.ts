@@ -1,4 +1,15 @@
-import { ProposalStatus, type Proposal } from "@/types/Proposal";
+import {
+  ProposalStatus,
+  type Proposal,
+  type RequestedDocumentType,
+} from "@/types/Proposal";
+
+const documentTypeLabels: Record<RequestedDocumentType, string> = {
+  RG_FRENTE_VERSO: "RG frente e verso",
+  CNH_ABERTA: "CNH aberta",
+  COMPROVANTE_RESIDENCIA: "Comprovante de residência",
+  SELFIE_COM_DOCUMENTO: "Selfie com documento",
+};
 
 function normalizeName(value: string) {
   return value
@@ -103,6 +114,7 @@ export const proposalsMock: Proposal[] = [
         outcome: "SUCESSO",
       },
     ],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/1/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/1/documento.pdf",
@@ -137,6 +149,7 @@ export const proposalsMock: Proposal[] = [
         outcome: "SUCESSO",
       },
     ],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/2/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/2/documento.pdf",
@@ -171,6 +184,7 @@ export const proposalsMock: Proposal[] = [
         outcome: "SEM_RESPOSTA",
       },
     ],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/3/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/3/documento.pdf",
@@ -205,6 +219,7 @@ export const proposalsMock: Proposal[] = [
         outcome: "FALHA",
       },
     ],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/4/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/4/documento.pdf",
@@ -221,8 +236,8 @@ export const proposalsMock: Proposal[] = [
     numeroProposta: "NC-2026-0005",
     nomeCliente: "Rafael Mendonça",
     cpfCliente: "222.333.444-55",
-    status: ProposalStatus.AGUARDANDO,
-    dataUltimoEvento: "2026-05-11T09:00:00.000Z",
+    status: ProposalStatus.AGUARDANDO_DOCUMENTOS,
+    dataUltimoEvento: "2026-05-11T09:05:00.000Z",
     assinaturaUrl: "https://assinatura.neo-credito.local/NC-2026-0005",
     dataEnvio: "2026-05-11T07:30:00.000Z",
     tentativasContato: [
@@ -231,6 +246,17 @@ export const proposalsMock: Proposal[] = [
         channel: "WHATSAPP",
         timestamp: "2026-05-11T07:35:00.000Z",
         outcome: "SEM_RESPOSTA",
+      },
+    ],
+    documentRequests: [
+      {
+        id: "5-r1",
+        documentType: "COMPROVANTE_RESIDENCIA",
+        documentLabel: "Comprovante de residência",
+        instructions:
+          "Reenviar comprovante emitido nos últimos 90 dias, com endereço completo e sem cortes na imagem.",
+        requestedAt: "2026-05-11T09:05:00.000Z",
+        requestedBy: "OPERACAO",
       },
     ],
     dossie: {
@@ -267,6 +293,7 @@ export const proposalsMock: Proposal[] = [
         outcome: "SUCESSO",
       },
     ],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/6/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/6/documento.pdf",
@@ -307,6 +334,7 @@ export const proposalsMock: Proposal[] = [
         outcome: "FALHA",
       },
     ],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/7/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/7/documento.pdf",
@@ -335,6 +363,7 @@ export const proposalsMock: Proposal[] = [
         outcome: "SEM_RESPOSTA",
       },
     ],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/8/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/8/documento.pdf",
@@ -369,6 +398,7 @@ export const proposalsMock: Proposal[] = [
         outcome: "SEM_RESPOSTA",
       },
     ],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/9/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/9/documento.pdf",
@@ -397,6 +427,7 @@ export const proposalsMock: Proposal[] = [
         outcome: "SUCESSO",
       },
     ],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.neo-credito.local/dossie/10/selfie.jpg",
       documentoUrl: "https://cdn.neo-credito.local/dossie/10/documento.pdf",
@@ -438,6 +469,42 @@ export function updateProposalStatusMock(id: string, status: ProposalStatus) {
     ...proposalsMock[targetIndex],
     status,
     dataUltimoEvento: new Date().toISOString(),
+  };
+
+  proposalsMock[targetIndex] = updatedProposal;
+
+  return updatedProposal;
+}
+
+export function requestNewDocumentMock(
+  id: string,
+  payload: {
+    documentType: RequestedDocumentType;
+    instructions: string;
+  },
+) {
+  const targetIndex = proposalsMock.findIndex((proposal) => proposal.id === id);
+
+  if (targetIndex < 0) {
+    return null;
+  }
+
+  const requestedAt = new Date().toISOString();
+  const updatedProposal: Proposal = {
+    ...proposalsMock[targetIndex],
+    status: ProposalStatus.AGUARDANDO_DOCUMENTOS,
+    dataUltimoEvento: requestedAt,
+    documentRequests: [
+      {
+        id: `${id}-r${proposalsMock[targetIndex].documentRequests.length + 1}`,
+        documentType: payload.documentType,
+        documentLabel: documentTypeLabels[payload.documentType],
+        instructions: payload.instructions,
+        requestedAt,
+        requestedBy: "OPERACAO",
+      },
+      ...proposalsMock[targetIndex].documentRequests,
+    ],
   };
 
   proposalsMock[targetIndex] = updatedProposal;

@@ -3,9 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 import {
   fetchProposalsMock,
   proposalsMock,
+  requestNewDocumentMock,
   updateProposalStatusMock,
 } from "@/services/mocks/proposals";
-import { ProposalStatus } from "@/types/Proposal";
+import { ProposalStatus, type RequestedDocumentType } from "@/types/Proposal";
 
 export function useProposals() {
   const [proposals, setProposals] = useState(() => [...proposalsMock]);
@@ -74,6 +75,31 @@ export function useProposals() {
     [],
   );
 
+  const requestNewDocument = useCallback(
+    (
+      id: string,
+      payload: {
+        documentType: RequestedDocumentType;
+        instructions: string;
+      },
+    ) => {
+      const updatedProposal = requestNewDocumentMock(id, payload);
+
+      if (!updatedProposal) {
+        return false;
+      }
+
+      setProposals((currentProposals) =>
+        currentProposals.map((proposal) =>
+          proposal.id === id ? updatedProposal : proposal,
+        ),
+      );
+
+      return true;
+    },
+    [],
+  );
+
   return {
     proposals,
     isLoading,
@@ -82,5 +108,6 @@ export function useProposals() {
     retry: () => loadProposals(),
     refresh: () => loadProposals(true),
     updateProposalStatus,
+    requestNewDocument,
   };
 }

@@ -1,10 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowUpRight,
-  RotateCcw,
-} from "lucide-react";
+import { ArrowUpRight, RotateCcw } from "lucide-react";
 
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
@@ -17,6 +14,10 @@ import { ProposalStatus } from "@/types/Proposal";
 import styles from "./page.module.css";
 
 function getStatusLabel(status: ProposalStatus) {
+  if (status === ProposalStatus.AGUARDANDO_DOCUMENTOS) {
+    return "Aguardando Documentos";
+  }
+
   if (status === ProposalStatus.AGUARDANDO_AUDITORIA) {
     return "Aguardando Auditoria";
   }
@@ -69,7 +70,9 @@ export default function ValidacaoPage() {
   }
 
   const waitingCount = proposals.filter(
-    (proposal) => proposal.status === ProposalStatus.AGUARDANDO,
+    (proposal) =>
+      proposal.status === ProposalStatus.AGUARDANDO ||
+      proposal.status === ProposalStatus.AGUARDANDO_DOCUMENTOS,
   ).length;
   const auditCount = proposals.filter(
     (proposal) => proposal.status === ProposalStatus.AGUARDANDO_AUDITORIA,

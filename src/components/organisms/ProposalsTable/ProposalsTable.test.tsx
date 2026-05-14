@@ -17,6 +17,7 @@ function createProposal(overrides: Partial<Proposal>): Proposal {
     assinaturaUrl: "https://assinatura.neo-credito.local/NC-2026-0001",
     dataEnvio: "2026-05-10T13:20:00.000Z",
     tentativasContato: [],
+    documentRequests: [],
     dossie: {
       selfieUrl: "https://cdn.local/selfie.jpg",
       documentoUrl: "https://cdn.local/documento.pdf",
@@ -47,7 +48,9 @@ describe("ProposalsTable", () => {
 
     renderWithTheme(<ProposalsTable proposals={proposals} />);
 
-    expect(screen.getByRole("columnheader", { name: "Cliente" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: "Cliente" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("NC-2026-0001")).toBeInTheDocument();
     expect(screen.getByText("Carlos Lima")).toBeInTheDocument();
     expect(screen.getByText("ASSINADO")).toBeInTheDocument();
@@ -60,11 +63,15 @@ describe("ProposalsTable", () => {
     const proposal = createProposal({ id: "10", nomeCliente: "Joana Teste" });
     const onRowClick = jest.fn();
 
-    renderWithTheme(<ProposalsTable proposals={[proposal]} onRowClick={onRowClick} />);
+    renderWithTheme(
+      <ProposalsTable proposals={[proposal]} onRowClick={onRowClick} />,
+    );
 
     await user.click(screen.getByRole("button", { name: /NC-2026-0001/i }));
 
     expect(onRowClick).toHaveBeenCalledTimes(1);
-    expect(onRowClick).toHaveBeenCalledWith(expect.objectContaining({ id: "10" }));
+    expect(onRowClick).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "10" }),
+    );
   });
 });
